@@ -5,6 +5,7 @@ import com.hotifi.constants.BusinessConfigurations;
 import com.hotifi.constants.SuccessMessages;
 import com.hotifi.entities.Authentication;
 import com.hotifi.exception.errors.ErrorMessages;
+import com.hotifi.exception.errors.ErrorResponse;
 import com.hotifi.services.interfaces.IAuthenticationService;
 import com.hotifi.validator.SocialClient;
 import com.hotifi.web.request.EmailOtpRequest;
@@ -18,7 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
