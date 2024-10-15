@@ -1,3 +1,0 @@
-spring:
-  config:
-    import: "C:/Users/Suraj.000/IdeaProjects/hotifi-service-v2/src/main/resources/application.yaml"
