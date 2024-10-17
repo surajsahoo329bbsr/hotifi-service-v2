@@ -1,5 +1,6 @@
 package com.hotifi.common.models;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +9,7 @@ import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
+@Builder
 public class EmailModel {
 
     @NotBlank(message = "{from.email.blank}")

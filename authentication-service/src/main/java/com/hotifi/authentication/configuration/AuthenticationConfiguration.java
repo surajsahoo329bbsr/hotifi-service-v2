@@ -1,6 +1,7 @@
 package com.hotifi.authentication.configuration;
 
 import com.hotifi.common.services.implementations.VerificationServiceImpl;
+import com.hotifi.common.services.interfaces.IEmailService;
 import com.hotifi.common.services.interfaces.IVerificationService;
 import com.hotifi.authentication.repositories.AuthenticationRepository;
 import com.hotifi.authentication.repositories.RoleRepository;
@@ -13,8 +14,8 @@ import org.springframework.context.annotation.Configuration;
 public class AuthenticationConfiguration {
 
     @Bean
-    public IAuthenticationService authenticationService(AuthenticationRepository authenticationRepository, RoleRepository roleRepository, IVerificationService verificationService) {
-        return new AuthenticationServiceImpl(authenticationRepository, roleRepository, verificationService);
+    public IAuthenticationService authenticationService(AuthenticationRepository authenticationRepository, RoleRepository roleRepository, IVerificationService verificationService, IEmailService emailService) {
+        return new AuthenticationServiceImpl(authenticationRepository, roleRepository, verificationService, emailService);
     }
 
     @Bean

@@ -1,12 +1,10 @@
 package com.hotifi.authentication.utils;
 
 import com.eatthepath.otp.TimeBasedOneTimePasswordGenerator;
-import com.google.api.client.util.Value;
 import com.hotifi.common.constants.BusinessConstants;
 import com.hotifi.authentication.entities.Authentication;
 import com.hotifi.authentication.errors.codes.AuthenticationErrorCodes;
 import com.hotifi.common.exception.ApplicationException;
-import com.hotifi.common.models.EmailModel;
 import com.hotifi.authentication.repositories.AuthenticationRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.mindrot.jbcrypt.BCrypt;
@@ -22,12 +20,6 @@ public class OtpUtils {
 
     //@Autowired
     //private IEmailService emailService;
-
-    @Value("${email.no-reply-address}")
-    private static String noReplyEmailAddress;
-
-    @Value("${email.no-reply-password}")
-    private static String noReplyEmailPassword;
 
     public static String generateEmailOtp() {
         //do stuff
@@ -62,28 +54,20 @@ public class OtpUtils {
     }
 
     //needs to be called from generateEmailOtpSignUp or generateEmailOtpLogin
-    public static void saveAuthenticationEmailOtp(Authentication authentication, AuthenticationRepository authenticationRepository){
+    public static String saveAndReturnAuthenticationEmailOtp(Authentication authentication, AuthenticationRepository authenticationRepository){
+        String encryptedEmailOtp;
         try {
             String emailOtp = generateEmailOtp();
             log.info("Otp " + emailOtp);
-            String encryptedEmailOtp = BCrypt.hashpw(emailOtp, BCrypt.gensalt());
+            encryptedEmailOtp = BCrypt.hashpw(emailOtp, BCrypt.gensalt());
             Date now = new Date(System.currentTimeMillis()); //set updated token created time
             authentication.setModifiedAt(now);
             authentication.setEmailOtp(encryptedEmailOtp);
             authenticationRepository.save(authentication); //updating otp in password
-
-            //Populating email model with values
-            EmailModel emailModel = new EmailModel();
-            emailModel.setToEmail(authentication.getEmail());
-            emailModel.setFromEmail(noReplyEmailAddress);
-            emailModel.setFromEmailPassword(noReplyEmailPassword);
-            emailModel.setEmailOtp(emailOtp);
-
-            //emailService.sendEmailOtpEmail(emailModel);
-            //emailService.sendEmail(null, emailModel, 0);
         } catch (Exception e){
             throw new ApplicationException(AuthenticationErrorCodes.UNEXPECTED_EMAIL_OTP_ERROR);
         }
+        return encryptedEmailOtp;
     }
 
 }

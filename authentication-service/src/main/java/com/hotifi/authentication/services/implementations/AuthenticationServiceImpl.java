@@ -1,5 +1,7 @@
 package com.hotifi.authentication.services.implementations;
 
+import com.google.api.client.util.Value;
+import com.hotifi.authentication.utils.OtpUtils;
 import com.hotifi.common.constants.codes.CloudClientCodes;
 import com.hotifi.common.constants.codes.SocialCodes;
 import com.hotifi.authentication.entities.Authentication;
@@ -7,6 +9,8 @@ import com.hotifi.authentication.entities.Role;
 import com.hotifi.common.exception.ApplicationException;
 import com.hotifi.authentication.errors.codes.AuthenticationErrorCodes;
 import com.hotifi.authentication.errors.messages.AuthenticationErrorMessages;
+import com.hotifi.common.models.EmailModel;
+import com.hotifi.common.services.interfaces.IEmailService;
 import com.hotifi.common.services.interfaces.IVerificationService;
 import com.hotifi.common.models.RoleName;
 import com.hotifi.authentication.repositories.AuthenticationRepository;
@@ -35,11 +39,19 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private final AuthenticationRepository authenticationRepository;
     private final RoleRepository roleRepository;
     private final IVerificationService verificationService;
+    private final IEmailService emailService;
 
-    public AuthenticationServiceImpl(AuthenticationRepository authenticationRepository, RoleRepository roleRepository, IVerificationService verificationService) {
+    @Value("${email.no-reply-address}")
+    private static String noReplyEmailAddress;
+
+    @Value("${email.no-reply-password}")
+    private static String noReplyEmailPassword;
+
+    public AuthenticationServiceImpl(AuthenticationRepository authenticationRepository, RoleRepository roleRepository, IVerificationService verificationService, IEmailService emailService) {
         this.authenticationRepository = authenticationRepository;
         this.roleRepository = roleRepository;
         this.verificationService = verificationService;
+        this.emailService = emailService;
     }
 
     @Override
@@ -80,9 +92,16 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                 authentication.setModifiedAt(modifiedAt);
                 authenticationRepository.save(authentication);
             }
-            //TODO
             else {
-                //OtpUtils.saveAuthenticationEmailOtp(authentication, authenticationRepository, emailService);
+                String emailOtp = OtpUtils.saveAndReturnAuthenticationEmailOtp(authentication, authenticationRepository);
+                //Populating email model with values
+                EmailModel emailModel = EmailModel.builder()
+                        .toEmail(authentication.getEmail())
+                        .fromEmail(noReplyEmailAddress)
+                        .fromEmailPassword(noReplyEmailPassword)
+                        .emailOtp(authentication.getEmailOtp())
+                        .build();
+                emailService.sendEmailOtpEmail(emailModel);
             }
             return new CredentialsResponse(authentication.getEmail(), password);
         } catch (DataIntegrityViolationException e) {
@@ -105,9 +124,16 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             throw new ApplicationException(AuthenticationErrorCodes.EMAIL_ALREADY_VERIFIED);
         //If token created at is null, it means otp is generated for first time or Otp duration expired and we are setting new Otp
         log.info("Regenerating Otp...");
-        //TODO
-        //OtpUtils.saveAuthenticationEmailOtp(authentication, authenticationRepository, emailService);
+        String emailOtp = OtpUtils.saveAndReturnAuthenticationEmailOtp(authentication, authenticationRepository);
+        //Populating email model with values
+        EmailModel emailModel = EmailModel.builder()
+                .toEmail(authentication.getEmail())
+                .fromEmail(noReplyEmailAddress)
+                .fromEmailPassword(noReplyEmailPassword)
+                .emailOtp(authentication.getEmailOtp())
+                .build();
 
+        emailService.sendEmailOtpEmail(emailModel);
     }
 
     @Transactional
@@ -118,13 +144,12 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             throw new ApplicationException(AuthenticationErrorCodes.EMAIL_NOT_FOUND);
         if (authentication.isEmailVerified())
             throw new ApplicationException(AuthenticationErrorCodes.EMAIL_ALREADY_VERIFIED);
-        //TODO
-        /*if (OtpUtils.isEmailOtpExpired(authentication)) {
+        if (OtpUtils.isEmailOtpExpired(authentication)) {
             log.error("Otp Expired");
             authentication.setEmailOtp(null);
             authenticationRepository.save(authentication);
-            throw new AppException(AuthenticationErrorCodes.EMAIL_OTP_EXPIRED);
-        }*/
+            throw new ApplicationException(AuthenticationErrorCodes.EMAIL_OTP_EXPIRED);
+        }
         String encryptedEmailOtp = authentication.getEmailOtp();
         if (BCrypt.checkpw(emailOtp, encryptedEmailOtp)) {
             authentication.setEmailOtp(null);
