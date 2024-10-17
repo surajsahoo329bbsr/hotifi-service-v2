@@ -17,6 +17,8 @@
 
     <modules>
         <module>authentication-service</module>
+        <module>user-service</module>
+        <module>common-service</module>
     </modules>
 
     <dependencies>
@@ -219,5 +221,16 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Compiler plugin to enable annotation processing -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

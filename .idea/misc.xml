@@ -9,12 +9,10 @@
     </option>
     <option name="ignoredFiles">
       <set>
-        <option value="$PROJECT_DIR$/common-service/pom.xml" />
         <option value="$PROJECT_DIR$/offer-service/pom.xml" />
         <option value="$PROJECT_DIR$/payment-service/pom.xml" />
         <option value="$PROJECT_DIR$/session-service/pom.xml" />
         <option value="$PROJECT_DIR$/speedtest-service/pom.xml" />
-        <option value="$PROJECT_DIR$/user-service/pom.xml" />
       </set>
     </option>
   </component>
