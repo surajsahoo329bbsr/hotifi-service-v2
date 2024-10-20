@@ -1,5 +1,6 @@
 package com.hotifi.authentication.configuration;
 
+import com.hotifi.common.services.implementations.EmailServiceImpl;
 import com.hotifi.common.services.implementations.VerificationServiceImpl;
 import com.hotifi.common.services.interfaces.IEmailService;
 import com.hotifi.common.services.interfaces.IVerificationService;
@@ -21,5 +22,10 @@ public class AuthenticationConfiguration {
     @Bean
     public IVerificationService verificationService() {
         return new VerificationServiceImpl();
+    }
+
+    @Bean
+    public IEmailService emailService() {
+        return new EmailServiceImpl();
     }
 }

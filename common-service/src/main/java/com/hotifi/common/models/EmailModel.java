@@ -25,4 +25,6 @@ public class EmailModel {
 
     private String emailOtp;
 
+    private String content;
+
 }

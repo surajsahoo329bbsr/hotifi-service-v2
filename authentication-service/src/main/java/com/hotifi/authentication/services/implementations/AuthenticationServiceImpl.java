@@ -41,11 +41,6 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private final IVerificationService verificationService;
     private final IEmailService emailService;
 
-    @Value("${email.no-reply-address}")
-    private static String noReplyEmailAddress;
-
-    @Value("${email.no-reply-password}")
-    private static String noReplyEmailPassword;
 
     public AuthenticationServiceImpl(AuthenticationRepository authenticationRepository, RoleRepository roleRepository, IVerificationService verificationService, IEmailService emailService) {
         this.authenticationRepository = authenticationRepository;
@@ -95,13 +90,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             else {
                 String emailOtp = OtpUtils.saveAndReturnAuthenticationEmailOtp(authentication, authenticationRepository);
                 //Populating email model with values
-                EmailModel emailModel = EmailModel.builder()
-                        .toEmail(authentication.getEmail())
-                        .fromEmail(noReplyEmailAddress)
-                        .fromEmailPassword(noReplyEmailPassword)
-                        .emailOtp(authentication.getEmailOtp())
-                        .build();
-                emailService.sendEmailOtpEmail(emailModel);
+                emailService.sendEmailOtpEmail(email, emailOtp);
             }
             return new CredentialsResponse(authentication.getEmail(), password);
         } catch (DataIntegrityViolationException e) {
@@ -125,15 +114,8 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         //If token created at is null, it means otp is generated for first time or Otp duration expired and we are setting new Otp
         log.info("Regenerating Otp...");
         String emailOtp = OtpUtils.saveAndReturnAuthenticationEmailOtp(authentication, authenticationRepository);
-        //Populating email model with values
-        EmailModel emailModel = EmailModel.builder()
-                .toEmail(authentication.getEmail())
-                .fromEmail(noReplyEmailAddress)
-                .fromEmailPassword(noReplyEmailPassword)
-                .emailOtp(authentication.getEmailOtp())
-                .build();
 
-        emailService.sendEmailOtpEmail(emailModel);
+        emailService.sendEmailOtpEmail(email, emailOtp);
     }
 
     @Transactional

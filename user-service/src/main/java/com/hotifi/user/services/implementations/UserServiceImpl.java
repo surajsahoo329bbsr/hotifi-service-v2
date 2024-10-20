@@ -1,16 +1,43 @@
 package com.hotifi.user.services.implementations;
 
 import com.google.api.client.util.Value;
+import com.hotifi.authentication.entities.Authentication;
+import com.hotifi.authentication.errors.codes.AuthenticationErrorCodes;
+import com.hotifi.authentication.repositories.AuthenticationRepository;
+import com.hotifi.authentication.utils.OtpUtils;
+import com.hotifi.common.constants.codes.SocialCodes;
+import com.hotifi.common.dto.UserRegistrationEventDTO;
+import com.hotifi.common.exception.ApplicationException;
+import com.hotifi.common.services.interfaces.IEmailService;
+import com.hotifi.common.services.interfaces.IVerificationService;
+import com.hotifi.user.entitiies.User;
+import com.hotifi.user.errors.codes.UserErrorCodes;
+import com.hotifi.user.events.UserRegistrationEvent;
+import com.hotifi.user.repositories.UserRepository;
+import com.hotifi.user.services.interfaces.IUserService;
+import com.hotifi.user.validators.UserStatusValidator;
+import com.hotifi.user.web.request.UserRequest;
+import com.hotifi.user.web.response.CredentialsResponse;
+import com.hotifi.user.web.response.FacebookDeletionResponse;
+import com.hotifi.user.web.response.FacebookDeletionStatusResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.kafka.core.KafkaTemplate;
+
+import java.util.Date;
+import java.util.UUID;
 
 @Slf4j
-public class UserServiceImpl {
+public class UserServiceImpl implements IUserService {
 
-    //private final UserRepository userRepository;
-    //private final IEmailService emailService;
-    //private final IVerificationService verificationService;
+    private final UserRepository userRepository;
+    private final IEmailService emailService;
+    private final IVerificationService verificationService;
+    private final AuthenticationRepository authenticationRepository;
+    private final KafkaTemplate<String, UserRegistrationEvent> userRegistrationEventKafkaTemplate;
 
     @Value("${email.host}")
     private String emailHost;
@@ -30,48 +57,149 @@ public class UserServiceImpl {
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
 
-    /*public UserServiceImpl(UserRepository userRepository, AuthenticationRepository authenticationRepository, IEmailService emailService, IVerificationService verificationService) {
+    public UserServiceImpl(UserRepository userRepository, AuthenticationRepository authenticationRepository, IEmailService emailService, IVerificationService verificationService, KafkaTemplate<String, UserRegistrationEvent> userRegistrationEventKafkaTemplate) {
         this.userRepository = userRepository;
         this.authenticationRepository = authenticationRepository;
         this.emailService = emailService;
         this.verificationService = verificationService;
+        this.userRegistrationEventKafkaTemplate = userRegistrationEventKafkaTemplate;
     }
 
     @Override
-    @Transactional
-    public void addUser(UserRequest userRequest) {
+    public UserRegistrationEventDTO addUser(UserRequest userRequest) {
+        UserRegistrationEventDTO userRegistrationEventDTO;
         Authentication authentication = authenticationRepository.findById(userRequest.getAuthenticationId()).orElse(null);
         if (authentication == null)
-            throw new HotifiException(AuthenticationErrorCodes.EMAIL_NOT_FOUND);
+            throw new ApplicationException(AuthenticationErrorCodes.EMAIL_NOT_FOUND);
         if (!authentication.isEmailVerified() || !authentication.isPhoneVerified())
-            throw new HotifiException(AuthenticationErrorCodes.AUTHENTICATION_NOT_VERIFIED);
+            throw new ApplicationException(AuthenticationErrorCodes.AUTHENTICATION_NOT_VERIFIED);
         if (userRepository.existsByFacebookId(userRequest.getFacebookId()) && userRequest.getFacebookId() != null)
-            throw new HotifiException(UserErrorCodes.FACEBOOK_USER_EXISTS);
+            throw new ApplicationException(UserErrorCodes.FACEBOOK_USER_EXISTS);
         if (userRepository.existsByGoogleId(userRequest.getGoogleId()) && userRequest.getGoogleId() != null)
-            throw new HotifiException(UserErrorCodes.GOOGLE_USER_EXISTS);
+            throw new ApplicationException(UserErrorCodes.GOOGLE_USER_EXISTS);
         if (userRepository.existsByUsername(userRequest.getUsername()))
-            throw new HotifiException(UserErrorCodes.USERNAME_EXISTS);
+            throw new ApplicationException(UserErrorCodes.USERNAME_EXISTS);
         try {
             User user = new User();
             authentication.setActivated(true);
             authentication.setEmailOtp(null);
-            setUser(userRequest, user, authentication);
+            setUser(userRequest, user, authentication.getId());
             userRepository.save(user);
             authenticationRepository.save(authentication);
 
-            EmailModel emailModel = new EmailModel();
-            emailModel.setToEmail(authentication.getEmail());
-            emailModel.setFromEmail(noReplyEmailAddress);
-            emailModel.setFromEmailPassword(noReplyEmailPassword);
-            emailService.sendWelcomeEmail(user, emailModel);
+            //Kafka Event
+            UserRegistrationEvent userRegistrationEvent = UserRegistrationEvent.
+                    builder()
+                    .userId(user.getId())
+                    .firstName(user.getFirstName())
+                    .lastName(user.getLastName())
+                    .email(authentication.getEmail())
+                    .registrationEventTime(new Date(System.currentTimeMillis()))
+                    .build();
+
+            userRegistrationEventDTO = UserRegistrationEventDTO.builder()
+                    .userId(user.getId())
+                    .email(authentication.getEmail())
+                    .firstName(user.getFirstName())
+                    .build();
+
+            userRegistrationEventKafkaTemplate.send("email-notifications", userRegistrationEvent);
+
         } catch (DataIntegrityViolationException e) {
-            throw new HotifiException(UserErrorCodes.USER_EXISTS);
+            throw new ApplicationException(UserErrorCodes.USER_EXISTS);
         } catch (Exception e) {
             log.error("Error ", e);
-            throw new HotifiException(UserErrorCodes.UNEXPECTED_USER_ERROR);
+            throw new ApplicationException(UserErrorCodes.UNEXPECTED_USER_ERROR);
         }
+
+        return userRegistrationEventDTO;
     }
 
+    @Override
+    public CredentialsResponse resetPassword(String email, String emailOtp, String identifier, String token, SocialCodes socialCode) {
+        boolean isSocialLogin = identifier != null && token != null && socialCode != null;
+        boolean isCustomLogin = emailOtp != null;
+        boolean isBothSocialCustomLogin = isCustomLogin == isSocialLogin;
+        if (isBothSocialCustomLogin)
+            throw new ApplicationException(UserErrorCodes.BAD_RESET_PASSWORD_REQUEST);
+        Authentication authentication = authenticationRepository.findByEmail(email);
+        User user = authentication != null ? userRepository.findByAuthenticationId(authentication.getId()) : null;
+        if (user == null)
+            throw new ApplicationException(UserErrorCodes.USER_NOT_FOUND);
+        if (!UserStatusValidator.isAuthenticationLegit(authentication))
+            throw new ApplicationException(AuthenticationErrorCodes.AUTHENTICATION_NOT_LEGIT);
+
+        boolean isSocialUserVerified = isSocialLogin && verificationService.isSocialUserVerified(email, identifier, token, socialCode);
+
+        if (!isSocialUserVerified && OtpUtils.isEmailOtpExpired(authentication)) {
+            log.error("Otp Expired");
+            throw new ApplicationException(AuthenticationErrorCodes.EMAIL_OTP_EXPIRED);
+        }
+        if (isSocialUserVerified || BCrypt.checkpw(emailOtp, authentication.getEmailOtp())) {
+            log.info("User Email Verified");
+            String newPassword = UUID.randomUUID().toString();
+            String encryptedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+            //log.info("new : " + newPassword);
+            //log.info("enc : " + encryptedPassword);
+            authentication.setPassword(encryptedPassword);
+            authenticationRepository.save(authentication);
+            return new CredentialsResponse(email, newPassword);
+        }
+
+        throw new ApplicationException(UserErrorCodes.UNEXPECTED_USER_ERROR);
+    }
+
+    @Override
+    public User getUserByUsername(String username) {
+        return null;
+    }
+
+    @Override
+    public void sendEmailOtpLogin(String email) {
+
+    }
+
+    @Override
+    public boolean isUsernameAvailable(String username) {
+        return false;
+    }
+
+    @Override
+    public void resendEmailOtpLogin(String email) {
+
+    }
+
+    @Override
+    public void verifyEmailOtpLogin(String email, String emailOtp) {
+
+    }
+
+    @Override
+    public void updateUser(UserRequest userRequest) {
+
+    }
+
+    @Override
+    public void updateUserLogin(String email, boolean isLogin) {
+
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        return null;
+    }
+
+    @Override
+    public FacebookDeletionResponse deleteFacebookUserData(String signedRequest) {
+        return null;
+    }
+
+    @Override
+    public FacebookDeletionStatusResponse getFacebookDeletionStatus(String facebookId, String confirmationCode) {
+        return null;
+    }
+
+    /*
     @Transactional
     @Override
     public CredentialsResponse resetPassword(String email, String emailOtp, String identifier, String token, SocialCodes socialCode) {
@@ -242,12 +370,12 @@ public class UserServiceImpl {
         Date deletionRequestedAt = user.getFacebookDeleteRequestedAt();
         String reason = "We use your first name, last name and email address for legal reasons as these are involved in financial transactions. To read more please read our privacy policy in below url";
         return new FacebookDeletionStatusResponse(facebookId, deletionRequestedAt, false, reason, AppConfigurations.PRIVACY_POLICY_URL);
-    }
+    }*/
 
     //user defined functions
     //setting up user's values
-    public void setUser(UserRequest userRequest, User user, Authentication authentication) {
-        user.setAuthentication(authentication);
+    public void setUser(UserRequest userRequest, User user, Long authenticationId) {
+        user.setAuthenticationId(authenticationId);
         user.setFirstName(userRequest.getFirstName());
         user.setLastName(userRequest.getLastName());
         user.setFacebookId(userRequest.getFacebookId());
@@ -255,6 +383,6 @@ public class UserServiceImpl {
         user.setUsername(userRequest.getUsername());
         user.setPhotoUrl(userRequest.getPhotoUrl());
         user.setDateOfBirth(userRequest.getDateOfBirth());
-    }*/
+    }
 
 }

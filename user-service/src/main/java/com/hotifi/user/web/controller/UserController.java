@@ -3,6 +3,7 @@ package com.hotifi.user.web.controller;
 import com.hotifi.common.constants.BusinessConstants;
 import com.hotifi.common.constants.SuccessMessages;
 import com.hotifi.common.constants.codes.SocialCodes;
+import com.hotifi.common.dto.UserRegistrationEventDTO;
 import com.hotifi.common.exception.errors.ErrorMessages;
 import com.hotifi.common.exception.errors.ErrorResponse;
 import com.hotifi.common.validator.SocialClient;
@@ -54,8 +55,8 @@ public class UserController {
     @ApiResponses(value = @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class))
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
     public ResponseEntity<?> addUser(@RequestBody @Valid UserRequest userRequest) {
-        userService.addUser(userRequest);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        UserRegistrationEventDTO userRegistrationEventDTO = userService.addUser(userRequest);
+        return new ResponseEntity<>(userRegistrationEventDTO, HttpStatus.OK);
     }
 
     @PostMapping(path = "/facebook/delete", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

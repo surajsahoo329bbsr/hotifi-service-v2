@@ -7,7 +7,9 @@ public class ApplicationConstants {
 
         public static final boolean DIRECT_TRANSFER_API_ENABLED =  false;
 
-        public static final String FIREBASE_SERVICE_ACCOUNT_PATH = "firebase_service_account.json";
+        public static final String FIREBASE_SERVICE_ACCOUNT_PATH = "C:\\Users\\Suraj.000\\IdeaProjects\\hotifi-service-v2\\user-service\\src\\main\\resources\\firebase_service_account.yaml";
+        public static final String APPLICATION_ENVIRONMENT_FILE_DIRECTORY = "C:\\Users\\Suraj.000\\Desktop\\hotifi-app";
+        public static final String APPLICATION_ENVIRONMENT_FILENAME = "hotifi-secrets-pwds.env";
 
         //Email Paths
         public static final String EMAIL_OTP_HTML_PATH = "static/email_otp.html";
@@ -23,6 +25,7 @@ public class ApplicationConstants {
         public static final String SPEED_TEST_TAG = "speed-test";
         public static final String NOTIFICATION_TAG = "notification";
         public static final String USER_STATUS_TAG = "user-status";
+        public static final String EMAIL_TAG = "email";
         public static final String DEVICE_TAG = "device";
         public static final String SESSION_TAG = "session";
         public static final String PURCHASE_TAG = "purchase";

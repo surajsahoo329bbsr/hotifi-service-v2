@@ -13,6 +13,11 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class UserStatusServiceImpl implements IUserStatusService {
+
+    public UserStatusServiceImpl(){
+
+    }
+
     @Override
     public List<UserStatus> addUserStatus(UserStatusRequest userStatusRequest) {
         return null;

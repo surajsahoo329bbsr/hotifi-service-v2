@@ -55,7 +55,7 @@ public class User implements Serializable {
     private Date facebookDeleteRequestedAt;
 
     @Column(nullable = false)
-    private Long fromAuthenticationId;
+    private Long authenticationId;
 
     @Length(max = 2043, message = "{photo.url.max.length}")
     private String photoUrl;
