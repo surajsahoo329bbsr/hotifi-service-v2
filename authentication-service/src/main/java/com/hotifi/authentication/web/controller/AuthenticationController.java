@@ -1,5 +1,6 @@
 package com.hotifi.authentication.web.controller;
 
+import com.hotifi.authentication.repositories.AuthenticationRepository;
 import com.hotifi.common.constants.ApplicationConstants;
 import com.hotifi.common.constants.BusinessConstants;
 import com.hotifi.common.constants.SuccessMessages;
@@ -35,6 +36,9 @@ public class AuthenticationController {
     @Autowired
     private IAuthenticationService authenticationService;
 
+    @Autowired
+    private AuthenticationRepository authenticationRepository;
+
     @GetMapping(path = "/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Get Authentication Details By Email For Customer",
@@ -49,6 +53,22 @@ public class AuthenticationController {
             @NotBlank(message = "{email.blank}")
             @Email(message = "{email.pattern.invalid}") String email) {
         Authentication authentication = authenticationService.getAuthentication(email);
+        return new ResponseEntity<>(authentication, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(
+            value = "Get Authentication Details By Id",
+            notes = "Get Authentication Details By Id",
+            response = String.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class),
+            @ApiResponse(code = 200, message = SuccessMessages.OK, response = Authentication.class)
+    })
+    public ResponseEntity<?> getAuthentication(
+            @PathVariable(value = "id")
+            @NotBlank(message = "{id.blank}") Long authenticationId) {
+        Authentication authentication = authenticationRepository.findById(authenticationId).orElse(null);
         return new ResponseEntity<>(authentication, HttpStatus.OK);
     }
 

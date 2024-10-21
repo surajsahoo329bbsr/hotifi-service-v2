@@ -39,7 +39,7 @@ public class FacebookProcessor {
             //log.info("id " + identifier);
             return facebookId.equals(identifier);
         } catch (Exception e){
-            log.error("Error Occurred", e);
+            log.error("Error Occurred at {}", e.getMessage(), e);
         }
         return false;
     }

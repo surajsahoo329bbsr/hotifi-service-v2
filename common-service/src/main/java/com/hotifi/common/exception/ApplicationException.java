@@ -22,9 +22,9 @@ public class ApplicationException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
-    public static ApplicationException wrap(Throwable ex) {
-        log.error("Error:", ex);
-        return ex instanceof ApplicationException ? (ApplicationException) ex : new ApplicationException(ErrorCodes.INTERNAL_ERROR);
+    public static ApplicationException wrap(Throwable throwable) {
+        log.error("Error:", throwable);
+        return throwable instanceof ApplicationException ? (ApplicationException) throwable : new ApplicationException(ErrorCodes.INTERNAL_ERROR);
     }
 
 }

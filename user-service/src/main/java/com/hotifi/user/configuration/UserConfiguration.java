@@ -1,7 +1,6 @@
 package com.hotifi.user.configuration;
 
 import com.hotifi.authentication.repositories.AuthenticationRepository;
-import com.hotifi.common.services.interfaces.IEmailService;
 import com.hotifi.common.services.interfaces.IFirebaseMessagingService;
 import com.hotifi.common.services.interfaces.IVerificationService;
 import com.hotifi.user.events.UserEvent;
