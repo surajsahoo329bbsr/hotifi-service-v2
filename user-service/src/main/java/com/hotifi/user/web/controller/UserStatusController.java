@@ -2,6 +2,7 @@ package com.hotifi.user.web.controller;
 
 import com.hotifi.common.constants.ApplicationConstants;
 import com.hotifi.common.constants.SuccessMessages;
+import com.hotifi.common.dto.UserEventDTO;
 import com.hotifi.common.exception.errors.ErrorMessages;
 import com.hotifi.common.exception.errors.ErrorResponse;
 import com.hotifi.user.entitiies.UserStatus;
@@ -68,18 +69,18 @@ public class UserStatusController {
         return new ResponseEntity<>(userStatuses, HttpStatus.OK);
     }
 
-    @PutMapping(path = "/unfreeze/{user-id}")
+    @PutMapping(path = "/freeze/{user-id}")
     @ApiOperation(
-            value = "Unfreeze User Status By User Id",
-            notes = "Unfreeze User Status By User Id",
+            value = "freeze User Status By User Id",
+            notes = "freeze User Status By User Id",
             code = 204,
             response = String.class)
     @ApiResponses(value = @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class))
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
     @PreAuthorize("hasAuthority('CUSTOMER')")
-    public ResponseEntity<?> unfreezeUser(@PathVariable(value = "user-id") @Range(min = 1, message = "{user.id.invalid}") Long userId) {
+    public ResponseEntity<?> freezeUser(@PathVariable(value = "user-id") @Range(min = 1, message = "{user.id.invalid}") Long userId) {
         //if (customerAuthorizationService.isAuthorizedByUserId(userId, AuthorizationUtils.getUserToken()))
-            userStatusService.freezeUser(userId, false);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        UserEventDTO userEventDTO = userStatusService.freezeUser(userId, false);
+        return new ResponseEntity<>(userEventDTO, HttpStatus.OK);
     }
 }

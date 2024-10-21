@@ -11,12 +11,16 @@ import java.io.Serializable;
 @Setter
 @AllArgsConstructor
 @Builder
-public class UserRegistrationEventDTO implements Serializable {
+public class UserEventDTO implements Serializable {
 
     private Long userId;
 
     private String email;
 
     private String firstName;
+
+    private String emailOtp;
+
+    private String errorDescription;
 
 }

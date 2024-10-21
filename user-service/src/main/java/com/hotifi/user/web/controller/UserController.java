@@ -1,13 +1,13 @@
 package com.hotifi.user.web.controller;
 
+import com.hotifi.common.constants.ApplicationConstants;
 import com.hotifi.common.constants.BusinessConstants;
 import com.hotifi.common.constants.SuccessMessages;
 import com.hotifi.common.constants.codes.SocialCodes;
-import com.hotifi.common.dto.UserRegistrationEventDTO;
+import com.hotifi.common.dto.UserEventDTO;
 import com.hotifi.common.exception.errors.ErrorMessages;
 import com.hotifi.common.exception.errors.ErrorResponse;
 import com.hotifi.common.validator.SocialClient;
-import com.hotifi.user.constants.UserConstants;
 import com.hotifi.user.entitiies.User;
 import com.hotifi.user.repositories.UserRepository;
 import com.hotifi.user.services.interfaces.IUserService;
@@ -33,7 +33,7 @@ import javax.validation.constraints.Pattern;
 
 @Validated
 @RestController
-@Api(tags = UserConstants.USER_TAG)
+@Api(tags = ApplicationConstants.USER_TAG)
 @RequestMapping(path = "/user")
 public class UserController {
 
@@ -55,8 +55,8 @@ public class UserController {
     @ApiResponses(value = @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class))
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
     public ResponseEntity<?> addUser(@RequestBody @Valid UserRequest userRequest) {
-        UserRegistrationEventDTO userRegistrationEventDTO = userService.addUser(userRequest);
-        return new ResponseEntity<>(userRegistrationEventDTO, HttpStatus.OK);
+        UserEventDTO userEventDTO = userService.addUser(userRequest);
+        return new ResponseEntity<>(userEventDTO, HttpStatus.OK);
     }
 
     @PostMapping(path = "/facebook/delete", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

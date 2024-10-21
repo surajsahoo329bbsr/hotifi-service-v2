@@ -1,22 +1,21 @@
 package com.hotifi.common.services.interfaces;
 
-import com.hotifi.common.dto.UserRegistrationEventDTO;
-import com.hotifi.common.models.EmailModel;
+import com.hotifi.common.dto.UserEventDTO;
 
 public interface IEmailService {
 
-    void sendAccountDeletedEmail(Long userId, String firstName);
+    void sendAccountDeletedEmail(UserEventDTO userEventDTO);
 
-    void sendAccountFrozenEmail(Long userId, String firstName);
+    void sendAccountFrozenEmail(UserEventDTO userEventDTO);
 
-    void sendBuyerBannedEmail(Long userId, String firstName);
+    void sendBuyerBannedEmail(UserEventDTO userEventDTO);
 
     void sendEmailOtpEmail(String toEmailAddress, String emailOtp);
 
-    void sendLinkedAccountFailed(Long userId, String firstName, String errorDescription);
+    void sendLinkedAccountFailed(UserEventDTO userEventDTO);
 
-    void sendLinkedAccountSuccessEmail(Long userId, String firstName);
+    void sendLinkedAccountSuccessEmail(UserEventDTO userEventDTO);
 
-    void sendWelcomeEmail(UserRegistrationEventDTO userRegistrationEventDTO);
+    void sendWelcomeEmail(UserEventDTO userEventDTO);
 
 }

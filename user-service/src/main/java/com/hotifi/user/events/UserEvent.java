@@ -11,7 +11,7 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @Builder
-public class UserRegistrationEvent {
+public class UserEvent {
 
     private Long userId;
 
@@ -20,6 +20,10 @@ public class UserRegistrationEvent {
     private String firstName;
 
     private String lastName;
+
+    private String emailOtp;
+
+    private String errorDescription;
 
     private Date registrationEventTime;
 

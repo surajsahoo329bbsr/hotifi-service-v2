@@ -8,9 +8,9 @@ import com.hotifi.user.errors.codes.UserErrorCodes;
 
 public class UserStatusValidator {
     
-    public static boolean isAuthenticationLegit(Authentication authentication) {
+    public static boolean isAuthenticationStatusInvalid(Authentication authentication) {
         if (authentication == null)
-            return false;
+            return true;
         if (!authentication.isEmailVerified())
             throw new ApplicationException(AuthenticationErrorCodes.EMAIL_NOT_VERIFIED);
         if (!authentication.isPhoneVerified())
@@ -19,18 +19,18 @@ public class UserStatusValidator {
             throw new ApplicationException(UserErrorCodes.USER_NOT_ACTIVATED);
         if (authentication.isDeleted())
             throw new ApplicationException(UserErrorCodes.USER_DELETED);
-        return true;
+        return false;
     }
 
-    public static boolean isUserLegit(User user, Authentication authentication) {
+    public static boolean isUserStatusInvalid(User user, Authentication authentication) {
         if (user == null)
-            return false;
+            return true;
         if (!authentication.isActivated())
             throw new ApplicationException(UserErrorCodes.USER_NOT_ACTIVATED);
         if (authentication.isDeleted())
             throw new ApplicationException(UserErrorCodes.USER_DELETED);
         //login check not required because if user has been created then phone and email has been already verified
-        return true;
+        return false;
     }
 
     //Check if buyer is logged in / deleted / activated / freezed / banned / has upi id

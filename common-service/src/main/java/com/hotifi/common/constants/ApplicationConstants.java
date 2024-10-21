@@ -40,4 +40,10 @@ public class ApplicationConstants {
 
         //Policy Urls
         public static final String PRIVACY_POLICY_URL = "https://hotifi.com/privacy-policy.html";
+        public static final String FACEBOOK_DELETION_STATUS_REASON = "We use your first name, last name and email address for legal reasons as these are involved in financial transactions. To read more please read our privacy policy in below url";
+
+        //Kafka Topics
+        public static final String KAFKA_EMAIL_TOPIC = "email-notifications";
+        public static final String KAFKA_EMAIL_GROUP_ID = "email-group";
+
 }

@@ -7,11 +7,13 @@ import com.hotifi.user.entitiies.Device;
 import com.hotifi.user.repositories.DeviceRepository;
 import com.hotifi.user.services.interfaces.IDeviceService;
 import com.hotifi.user.services.interfaces.INotificationService;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class NotificationServiceImpl implements INotificationService {
 
     private final DeviceRepository deviceRepository;
@@ -36,7 +38,7 @@ public class NotificationServiceImpl implements INotificationService {
                 try {
                     firebaseMessagingService.sendNotificationToSingleUser(title, message, fcmToken);
                 } catch (FirebaseMessagingException e) {
-                    e.printStackTrace();
+                    log.error("Error occurred at {}", e.getMessage(), e);
                 }
             case AMAZON_WEB_SERVICES:
             case AZURE:
@@ -53,7 +55,7 @@ public class NotificationServiceImpl implements INotificationService {
                 try {
                     firebaseMessagingService.sendPhotoNotificationToMultipleUsers(title, message, commonPhotoUrl, fcmTokens);
                 } catch (FirebaseMessagingException e) {
-                    e.printStackTrace();
+                    log.error("Error occurred at {}", e.getMessage(), e);
                 }
             case AMAZON_WEB_SERVICES:
             case AZURE:
@@ -64,18 +66,13 @@ public class NotificationServiceImpl implements INotificationService {
     public void sendPhotoNotificationsToAllUsers(String title, String message, String photoUrl, CloudClientCodes notificationClientCode) {
         switch (notificationClientCode) {
             case GOOGLE_CLOUD_PLATFORM:
-                /*List<Long> userIds = userRepository.findAll().stream()
-                        .filter(user -> user.getAuthentication().isActivated() && !user.getAuthentication().isDeleted()
-                                && !user.getAuthentication().isBanned() && !user.getAuthentication().isFreezed())
-                        .map(User::getId)
-                        .collect(Collectors.toList());*/
                 List<String> fcmTokens = deviceRepository.findAll()
                         .stream().map(Device::getToken)
                         .collect(Collectors.toList());
                 try {
                     firebaseMessagingService.sendPhotoNotificationToMultipleUsers(title, message, photoUrl, fcmTokens);
                 } catch (FirebaseMessagingException e) {
-                    e.printStackTrace();
+                    log.error("Error occurred at {}", e.getMessage(), e);
                 }
 
             case AMAZON_WEB_SERVICES:

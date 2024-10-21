@@ -1,6 +1,5 @@
 package com.hotifi.authentication.services.implementations;
 
-import com.google.api.client.util.Value;
 import com.hotifi.authentication.utils.OtpUtils;
 import com.hotifi.common.constants.codes.CloudClientCodes;
 import com.hotifi.common.constants.codes.SocialCodes;
@@ -9,7 +8,6 @@ import com.hotifi.authentication.entities.Role;
 import com.hotifi.common.exception.ApplicationException;
 import com.hotifi.authentication.errors.codes.AuthenticationErrorCodes;
 import com.hotifi.authentication.errors.messages.AuthenticationErrorMessages;
-import com.hotifi.common.models.EmailModel;
 import com.hotifi.common.services.interfaces.IEmailService;
 import com.hotifi.common.services.interfaces.IVerificationService;
 import com.hotifi.common.models.RoleName;
@@ -88,7 +86,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                 authenticationRepository.save(authentication);
             }
             else {
-                String emailOtp = OtpUtils.saveAndReturnAuthenticationEmailOtp(authentication, authenticationRepository);
+                String emailOtp = OtpUtils.generateAuthenticationEmailOtp(authentication, authenticationRepository);
                 //Populating email model with values
                 emailService.sendEmailOtpEmail(email, emailOtp);
             }
@@ -113,7 +111,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             throw new ApplicationException(AuthenticationErrorCodes.EMAIL_ALREADY_VERIFIED);
         //If token created at is null, it means otp is generated for first time or Otp duration expired and we are setting new Otp
         log.info("Regenerating Otp...");
-        String emailOtp = OtpUtils.saveAndReturnAuthenticationEmailOtp(authentication, authenticationRepository);
+        String emailOtp = OtpUtils.generateAuthenticationEmailOtp(authentication, authenticationRepository);
 
         emailService.sendEmailOtpEmail(email, emailOtp);
     }

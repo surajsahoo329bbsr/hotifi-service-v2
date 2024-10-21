@@ -1,14 +1,13 @@
 package com.hotifi.user.configuration;
 
 import com.hotifi.authentication.repositories.AuthenticationRepository;
-import com.hotifi.common.services.implementations.EmailServiceImpl;
-import com.hotifi.common.services.implementations.VerificationServiceImpl;
 import com.hotifi.common.services.interfaces.IEmailService;
 import com.hotifi.common.services.interfaces.IFirebaseMessagingService;
 import com.hotifi.common.services.interfaces.IVerificationService;
-import com.hotifi.user.events.UserRegistrationEvent;
+import com.hotifi.user.events.UserEvent;
 import com.hotifi.user.repositories.DeviceRepository;
 import com.hotifi.user.repositories.UserRepository;
+import com.hotifi.user.repositories.UserStatusRepository;
 import com.hotifi.user.services.implementations.DeviceServiceImpl;
 import com.hotifi.user.services.implementations.NotificationServiceImpl;
 import com.hotifi.user.services.implementations.UserServiceImpl;
@@ -35,13 +34,13 @@ public class UserConfiguration {
     }
 
     @Bean
-    public IUserService userService(UserRepository userRepository, AuthenticationRepository authenticationRepository, IEmailService emailService, IVerificationService verificationService, KafkaTemplate<String, UserRegistrationEvent> userRegistrationEventKafkaTemplate){
-        return new UserServiceImpl(userRepository, authenticationRepository, emailService, verificationService, userRegistrationEventKafkaTemplate);
+    public IUserService userService(UserRepository userRepository, AuthenticationRepository authenticationRepository, IVerificationService verificationService, INotificationService notificationService, KafkaTemplate<String, UserEvent> userRegistrationEventKafkaTemplate){
+        return new UserServiceImpl(userRepository, authenticationRepository, verificationService, notificationService, userRegistrationEventKafkaTemplate);
     }
 
     @Bean
-    public IUserStatusService userStatusService(){
-        return new UserStatusServiceImpl();
+    public IUserStatusService userStatusService(AuthenticationRepository authenticationRepository, UserStatusRepository userStatusRepository, UserRepository userRepository, IDeviceService deviceService, INotificationService notificationService, KafkaTemplate<String, UserEvent> userEventKafkaTemplate){
+        return new UserStatusServiceImpl(authenticationRepository, userStatusRepository, userRepository, deviceService, notificationService, userEventKafkaTemplate);
     }
 
 }

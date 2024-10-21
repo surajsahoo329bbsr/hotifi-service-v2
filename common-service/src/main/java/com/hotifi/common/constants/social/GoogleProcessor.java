@@ -27,8 +27,6 @@ public class GoogleProcessor {
     @Value("{google.firebase.file-name}")
     private String firebaseFileName;
 
-    private static final Logger logger = LoggerFactory.getLogger(GoogleProcessor.class);
-
     public boolean verifyEmail(String email, String token) throws FirebaseAuthException {
         NetHttpTransport netHttpTransport = new NetHttpTransport();
         JacksonFactory jacksonFactory = new JacksonFactory();
@@ -45,7 +43,7 @@ public class GoogleProcessor {
             }
 
         } catch (GeneralSecurityException | IOException e) {
-            logger.error("An error occurred : {}", e.getMessage(), e);
+            log.error("An error occurred : {}", e.getMessage(), e);
 
         }
         return false;
@@ -75,10 +73,10 @@ public class GoogleProcessor {
                     return phoneNumber.contains("+" + countryCode + phone);
                 }
             } catch (Exception e){
-                logger.error("An error occurred : {}", e.getMessage(), e);
+                log.error("An error occurred : {}", e.getMessage(), e);
             }
         } catch (Exception e) {
-            logger.error("An error occurred : {}", e.getMessage(), e);
+            log.error("An error occurred : {}", e.getMessage(), e);
         }
         return false;
     }

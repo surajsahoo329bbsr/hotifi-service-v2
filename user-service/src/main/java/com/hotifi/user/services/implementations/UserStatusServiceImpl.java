@@ -1,44 +1,41 @@
 package com.hotifi.user.services.implementations;
 
 import com.google.api.client.util.Value;
+import com.hotifi.authentication.entities.Authentication;
+import com.hotifi.authentication.repositories.AuthenticationRepository;
+import com.hotifi.common.dto.UserEventDTO;
+import com.hotifi.common.exception.ApplicationException;
+import com.hotifi.user.entitiies.User;
 import com.hotifi.user.entitiies.UserStatus;
+import com.hotifi.user.errors.codes.UserStatusErrorCodes;
+import com.hotifi.user.events.UserEvent;
+import com.hotifi.user.repositories.UserRepository;
+import com.hotifi.user.repositories.UserStatusRepository;
+import com.hotifi.user.services.interfaces.IDeviceService;
+import com.hotifi.user.services.interfaces.INotificationService;
 import com.hotifi.user.services.interfaces.IUserStatusService;
 import com.hotifi.user.web.request.UserStatusRequest;
 import lombok.extern.slf4j.Slf4j;
+import com.hotifi.user.errors.codes.UserErrorCodes;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.hotifi.common.constants.ApplicationConstants.KAFKA_EMAIL_TOPIC;
+import static com.hotifi.common.constants.codes.CloudClientCodes.GOOGLE_CLOUD_PLATFORM;
+
 @Slf4j
 public class UserStatusServiceImpl implements IUserStatusService {
 
-    public UserStatusServiceImpl(){
-
-    }
-
-    @Override
-    public List<UserStatus> addUserStatus(UserStatusRequest userStatusRequest) {
-        return null;
-    }
-
-    @Override
-    public List<UserStatus> getUserStatusByUserId(Long userId) {
-        return null;
-    }
-
-    @Override
-    public void freezeUser(Long id, boolean freezeUser) {
-
-    }
-
-    /*private final AuthenticationRepository authenticationRepository;
+    private final AuthenticationRepository authenticationRepository;
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
-    private final BankAccountRepository bankAccountRepository;
     private final IDeviceService deviceService;
-    private final IEmailService emailService;
+    private final INotificationService notificationService;
+    private final KafkaTemplate<String, UserEvent> userEventKafkaTemplate;
 
     @Value("${email.no-reply-address}")
     private String noReplyEmailAddress;
@@ -46,39 +43,37 @@ public class UserStatusServiceImpl implements IUserStatusService {
     @Value("${email.no-reply-password}")
     private String noReplyEmailPassword;
 
-    public UserStatusServiceImpl(AuthenticationRepository authenticationRepository, UserStatusRepository userStatusRepository, UserRepository userRepository, BankAccountRepository bankAccountRepository, IDeviceService deviceService, IEmailService emailService) {
+    public UserStatusServiceImpl(AuthenticationRepository authenticationRepository, UserStatusRepository userStatusRepository, UserRepository userRepository, IDeviceService deviceService, INotificationService notificationService, KafkaTemplate<String, UserEvent> userEventKafkaTemplate){
         this.authenticationRepository = authenticationRepository;
         this.userStatusRepository = userStatusRepository;
         this.userRepository = userRepository;
-        this.bankAccountRepository = bankAccountRepository;
         this.deviceService = deviceService;
-        this.emailService = emailService;
+        this.notificationService = notificationService;
+        this.userEventKafkaTemplate = userEventKafkaTemplate;
     }
 
     @Transactional
     @Override
     public List<UserStatus> addUserStatus(UserStatusRequest userStatusRequest) {
-
-
         //Request must be of user being warned or deleted
         boolean isUserBeingWarnedXorDeleted = userStatusRequest.getWarningReason() != null ^ userStatusRequest.getDeleteReason() != null;
 
         if (!isUserBeingWarnedXorDeleted)
-            throw new HotifiException(UserStatusErrorCodes.NEITHER_WARNING_NOR_DELETE_REASON);
+            throw new ApplicationException(UserStatusErrorCodes.NEITHER_WARNING_NOR_DELETE_REASON);
         //Get user from id
         User user = userRepository.findById(userStatusRequest.getUserId()).orElse(null);
-        Long authenticationId = user != null ? user.getAuthentication().getId() : null;
+        Long authenticationId = user != null ? user.getAuthenticationId() : null;
         Authentication authentication = authenticationId != null ? authenticationRepository.findById(authenticationId).orElse(null) : null;
 
         if (authentication == null)
-            throw new HotifiException(UserErrorCodes.USER_NOT_FOUND);
+            throw new ApplicationException(UserErrorCodes.USER_NOT_FOUND);
         //Logic to see user if he/she has been freezed or banned
         if (authentication.isDeleted())
-            throw new HotifiException(UserErrorCodes.USER_ALREADY_DELETED);
+            throw new ApplicationException(UserErrorCodes.USER_ALREADY_DELETED);
         if (authentication.isBanned())
-            throw new HotifiException(UserErrorCodes.USER_ALREADY_BANNED);
-        if (authentication.isFreezed())
-            throw new HotifiException(UserErrorCodes.USER_ALREADY_FREEZED);
+            throw new ApplicationException(UserErrorCodes.USER_ALREADY_BANNED);
+        if (authentication.isFrozen())
+            throw new ApplicationException(UserErrorCodes.USER_ALREADY_FREEZED);
 
         //If user is not banned or deleted or freezed
         Long userId = userStatusRequest.getUserId();
@@ -117,7 +112,7 @@ public class UserStatusServiceImpl implements IUserStatusService {
                     banUser(userId, true);
                 }
             }*/
-        /*}
+        }
 
         userStatusRepository.save(userStatus);
         return getUserStatusByUserId(userId);
@@ -133,21 +128,24 @@ public class UserStatusServiceImpl implements IUserStatusService {
     //UserDefined functions
     @Override
     @Transactional
-    public void freezeUser(Long userId, boolean freezeUser) {
+    public UserEventDTO freezeUser(Long userId, boolean freezeUser) {
+
         User user = userRepository.findById(userId).orElse(null);
-        Long authenticationId = user != null ? user.getAuthentication().getId() : null;
+        Long authenticationId = user != null ? user.getAuthenticationId() : null;
         Authentication authentication = authenticationId != null ? authenticationRepository.findById(authenticationId).orElse(null) : null;
+        UserEventDTO userEventDTO = null;
+
         if (authentication == null)
-            throw new HotifiException(UserErrorCodes.USER_NOT_FOUND);
+            throw new ApplicationException(UserErrorCodes.USER_NOT_FOUND);
         //If we are unfreezing a freezed user
         if (!freezeUser) {
             //Logic to activate user if he/she has been freezed or banned
             if (authentication.isDeleted())
-                throw new HotifiException(UserErrorCodes.USER_ALREADY_DELETED);
+                throw new ApplicationException(UserErrorCodes.USER_ALREADY_DELETED);
             if (authentication.isBanned())
-                throw new HotifiException(UserErrorCodes.USER_ALREADY_BANNED);
+                throw new ApplicationException(UserErrorCodes.USER_ALREADY_BANNED);
             //Check if freezed user is activating
-            if (authentication.isFreezed()) {
+            if (authentication.isFrozen()) {
 
                 List<UserStatus> userStatuses = getUserStatusByUserId(user.getId())
                         .stream()
@@ -157,70 +155,98 @@ public class UserStatusServiceImpl implements IUserStatusService {
                 userStatuses.forEach(userStatus -> {
                     if (!isFreezePeriodExpired(userStatus)) {
                         log.error("Freeze period not over yet.");
-                        throw new HotifiException(UserStatusErrorCodes.USER_FREEZE_PERIOD_ACTIVE);
+                        throw new ApplicationException(UserStatusErrorCodes.USER_FREEZE_PERIOD_ACTIVE);
                     }
                 });
             }
         }
 
-        if (authentication.isFreezed() && freezeUser) {
-            throw new HotifiException(UserErrorCodes.USER_ALREADY_FREEZED);
-        } else if (!authentication.isFreezed() && !freezeUser) {
-            throw new HotifiException(UserErrorCodes.USER_ALREADY_NOT_FREEZED);
+        if (authentication.isFrozen() && freezeUser) {
+            throw new ApplicationException(UserErrorCodes.USER_ALREADY_FREEZED);
+        } else if (!authentication.isFrozen() && !freezeUser) {
+            throw new ApplicationException(UserErrorCodes.USER_ALREADY_NOT_FREEZED);
         } else {
-            authentication.setFreezed(freezeUser);
+            authentication.setFrozen(freezeUser);
             authenticationRepository.save(authentication);
             if (freezeUser) {
-                EmailModel emailModel = new EmailModel();
-                emailModel.setToEmail(user.getAuthentication().getEmail());
-                emailModel.setFromEmail(noReplyEmailAddress);
-                emailModel.setFromEmailPassword(noReplyEmailPassword);
-                emailService.sendAccountFreezedEmail(user, emailModel);
+                UserEvent userEvent = UserEvent.
+                        builder()
+                        .userId(user.getId())
+                        .firstName(user.getFirstName())
+                        .lastName(user.getLastName())
+                        .email(authentication.getEmail())
+                        .registrationEventTime(new Date(System.currentTimeMillis()))
+                        .build();
+
+                userEventKafkaTemplate.send(KAFKA_EMAIL_TOPIC, userEvent);
+                notificationService.sendNotificationToSingleUser(userId, "Account Suspended", "Your hotifi account for buying data has been suspended.", GOOGLE_CLOUD_PLATFORM);
+
+                userEventDTO = UserEventDTO.builder()
+                        .userId(user.getId())
+                        .email(authentication.getEmail())
+                        .firstName(user.getFirstName())
+                        .build();
             }
         }
+
+        return userEventDTO;
     }
 
     @Transactional
-    public void banUser(Long userId, boolean banUser) {
+    public UserEventDTO banUser(Long userId, boolean banUser) {
         User user = userRepository.findById(userId).orElse(null);
-        Long authenticationId = user != null ? user.getAuthentication().getId() : null;
+        Long authenticationId = user != null ? user.getAuthenticationId() : null;
         Authentication authentication = authenticationId != null ? authenticationRepository.findById(authenticationId).orElse(null) : null;
+        UserEventDTO userEventDTO = null;
 
         if ((authentication != null && authentication.isBanned()) && banUser)
-            throw new HotifiException(UserErrorCodes.USER_ALREADY_BANNED);
+            throw new ApplicationException(UserErrorCodes.USER_ALREADY_BANNED);
 
         if (!(authentication != null && authentication.isBanned()) && !banUser)
-            throw new HotifiException(UserErrorCodes.USER_ALREADY_NOT_BANNED);
+            throw new ApplicationException(UserErrorCodes.USER_ALREADY_NOT_BANNED);
 
         if (user != null && authentication != null) {
             if (banUser) {
                 user.setLoggedIn(false);
                 userRepository.save(user);
-                EmailModel emailModel = new EmailModel();
-                emailModel.setToEmail(user.getAuthentication().getEmail());
-                emailModel.setFromEmail(noReplyEmailAddress);
-                emailModel.setFromEmailPassword(noReplyEmailPassword);
-                emailService.sendBuyerBannedEmail(user, emailModel);
+                UserEvent userEvent = UserEvent.
+                        builder()
+                        .userId(user.getId())
+                        .firstName(user.getFirstName())
+                        .lastName(user.getLastName())
+                        .email(authentication.getEmail())
+                        .registrationEventTime(new Date(System.currentTimeMillis()))
+                        .build();
+
+                userEventKafkaTemplate.send(KAFKA_EMAIL_TOPIC, userEvent);
+                notificationService.sendNotificationToSingleUser(userId, "Banned !", "Your hotifi account for buying data has been deleted.", GOOGLE_CLOUD_PLATFORM);
+                userEventDTO = UserEventDTO.builder()
+                        .userId(user.getId())
+                        .email(authentication.getEmail())
+                        .firstName(user.getFirstName())
+                        .build();
             }
             authentication.setBanned(banUser);
             authenticationRepository.save(authentication);
+
+            return userEventDTO;
         }
+        return userEventDTO;
     }
 
     @Transactional
-    public void deleteUser(Long userId) {
+    public UserEventDTO deleteUser(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
-        Long authenticationId = user != null ? user.getAuthentication().getId() : null;
+        Long authenticationId = user != null ? user.getAuthenticationId() : null;
         Authentication authentication = authenticationId != null ? authenticationRepository.findById(authenticationId).orElse(null) : null;
         if (authentication == null)
-            throw new HotifiException(UserErrorCodes.USER_NOT_FOUND);
+            throw new ApplicationException(UserErrorCodes.USER_NOT_FOUND);
 
         if (authentication.isDeleted()) {
             log.error("Account already deleted");
-            throw new HotifiException(UserErrorCodes.USER_ALREADY_DELETED);
+            throw new ApplicationException(UserErrorCodes.USER_ALREADY_DELETED);
         }
         //set authentication values to null
-        String toEmail = authentication.getEmail();
         Date deletedAt = new Date(System.currentTimeMillis());
         authentication.setDeleted(true);
         authentication.setEmail("(deleted)" + deletedAt); //email cannot be null
@@ -231,8 +257,9 @@ public class UserStatusServiceImpl implements IUserStatusService {
         deviceService.deleteUserDevices(userId);
 
         //delete linked bank account
-        if (user.getBankAccount() != null)
-            bankAccountRepository.delete(user.getBankAccount());
+        //TODO - move it to other service
+        /*if (user.getBankAccount() != null)
+            bankAccountRepository.delete(user.getBankAccount());*/
 
         //set user values to null
         user.setFacebookId(null);
@@ -240,11 +267,23 @@ public class UserStatusServiceImpl implements IUserStatusService {
         user.setLoggedIn(false);
         userRepository.save(user);
 
-        EmailModel emailModel = new EmailModel();
-        emailModel.setToEmail(toEmail);
-        emailModel.setFromEmail(noReplyEmailAddress);
-        emailModel.setFromEmailPassword(noReplyEmailPassword);
-        emailService.sendAccountDeletedEmail(user, emailModel);
+        UserEvent userEvent = UserEvent.
+                builder()
+                .userId(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(authentication.getEmail())
+                .registrationEventTime(new Date(System.currentTimeMillis()))
+                .build();
+
+        userEventKafkaTemplate.send(KAFKA_EMAIL_TOPIC, userEvent);
+        notificationService.sendNotificationToSingleUser(userId, "Sorry To See You Go !", "Your hotifi account has been deleted.", GOOGLE_CLOUD_PLATFORM);
+
+        return UserEventDTO.builder()
+                .userId(user.getId())
+                .email(authentication.getEmail())
+                .firstName(user.getFirstName())
+                .build();
     }
 
     public boolean isFreezePeriodExpired(UserStatus userStatus) {
@@ -252,6 +291,6 @@ public class UserStatusServiceImpl implements IUserStatusService {
         long timeDifference = currentTime.getTime() - userStatus.getFreezeCreatedAt().getTime();
         long hoursDifference = timeDifference / (60L * 60L * 1000L);
         return hoursDifference >= userStatus.getFreezePeriod(); // If time period has exceeded freeze period
-    }*/
+    }
 
 }

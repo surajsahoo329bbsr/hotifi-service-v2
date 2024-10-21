@@ -34,11 +34,6 @@ public class OtpUtils {
                 keyGenerator.init(160);
                 key = keyGenerator.generateKey();
             }
-            //Instant now = Instant.now();
-            //final Instant later = now.plus(timeOtp.getTimeStep());
-
-            //System.out.format("Current password: %06d\n", timeOtp.generateOneTimePassword(key, now));
-            //System.out.format("Future password:  %06d\n", timeOtp.generateOneTimePassword(key, later));
             return String.valueOf(timeOtp.generateOneTimePassword(key, Instant.now()));
         } catch (Exception e) {
             log.error("Error ", e);
@@ -54,7 +49,7 @@ public class OtpUtils {
     }
 
     //needs to be called from generateEmailOtpSignUp or generateEmailOtpLogin
-    public static String saveAndReturnAuthenticationEmailOtp(Authentication authentication, AuthenticationRepository authenticationRepository){
+    public static String generateAuthenticationEmailOtp(Authentication authentication, AuthenticationRepository authenticationRepository){
         String encryptedEmailOtp;
         try {
             String emailOtp = generateEmailOtp();

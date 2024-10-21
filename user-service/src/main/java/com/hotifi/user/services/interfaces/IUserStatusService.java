@@ -1,6 +1,7 @@
 package com.hotifi.user.services.interfaces;
 
 
+import com.hotifi.common.dto.UserEventDTO;
 import com.hotifi.user.entitiies.UserStatus;
 import com.hotifi.user.web.request.UserStatusRequest;
 
@@ -12,6 +13,6 @@ public interface IUserStatusService {
 
     List<UserStatus> getUserStatusByUserId(Long userId);
 
-    void freezeUser(Long id, boolean freezeUser);
+    UserEventDTO freezeUser(Long id, boolean freezeUser);
 
 }
