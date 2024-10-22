@@ -1,38 +1,24 @@
 package com.hotifi.session.services.implementations;
 
 import com.google.api.client.util.Value;
-import com.hotifi.common.constants.ApplicationConstants;
-import com.hotifi.common.constants.BusinessConstants;
-import com.hotifi.common.exception.ApplicationException;
-import com.hotifi.common.utils.AESUtils;
 import com.hotifi.session.entities.Session;
-import com.hotifi.session.entities.SpeedTest;
-import com.hotifi.session.errors.codes.SessionErrorCodes;
 import com.hotifi.session.models.Buyer;
 import com.hotifi.session.repositories.SessionRepository;
 import com.hotifi.session.repositories.SpeedTestRepository;
 import com.hotifi.session.services.interfaces.ISessionService;
-import com.hotifi.session.services.interfaces.ISpeedTestService;
-import com.hotifi.session.utils.LocationUtils;
 import com.hotifi.session.web.request.SessionRequest;
 import com.hotifi.session.web.response.ActiveSessionsResponse;
 import com.hotifi.session.web.response.SessionSummaryResponse;
-import com.hotifi.user.entitiies.User;
+import com.hotifi.speedtest.services.interfaces.ISpeedTestService;
 import com.hotifi.user.repositories.UserRepository;
 import com.hotifi.user.services.interfaces.INotificationService;
 import com.hotifi.user.services.interfaces.IUserStatusService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class SessionServiceImpl implements ISessionService {
@@ -43,6 +29,9 @@ public class SessionServiceImpl implements ISessionService {
     private final ISpeedTestService speedTestService;
     private final IUserStatusService userStatusService;
     private final INotificationService notificationService;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Value("{business.aes.secret-key}")
     private String businessAESSecretKey;
@@ -58,6 +47,47 @@ public class SessionServiceImpl implements ISessionService {
 
     @Override
     public Session addSession(SessionRequest sessionRequest) {
+        /*User user = userRepository.findById(sessionRequest.getUserId()).orElse(null);
+        Authentication authentication = restTemplate.getForObject("http://localhost:8080/authenticate/" + user.getAuthenticationId(), Authentication.class);
+
+        boolean isSellerLegit = ApplicationConstants.DIRECT_TRANSFER_API_ENABLED ?
+                UserStatusValidator.isSellerLegit(user, authentication, false) : UserStatusValidator.isSellerUPILegit(user, authentication, false);
+        if (!isSellerLegit)
+            throw new ApplicationException(SessionErrorCodes.SELLER_NOT_LEGIT);
+
+        SpeedTest speedTest = speedTestService.getLatestSpeedTest(sessionRequest.getUserId(), sessionRequest.getPinCode(), sessionRequest.isWifi());
+        if (speedTest == null && sessionRequest.isWifi())
+            throw new ApplicationException(SessionErrorCodes.WIFI_SPEED_TEST_ABSENT);
+        if (speedTest == null)
+            throw new ApplicationException(SessionErrorCodes.SPEED_TEST_ABSENT);
+
+        SellerPayment sellerPayment = sellerPaymentRepository.findSellerPaymentBySellerId(user.getId());
+        if (sellerPayment != null && sellerPayment.getAmountEarned().compareTo(BigDecimal.valueOf(BusinessConstants.MAXIMUM_SELLER_AMOUNT_EARNED)) > 0)
+            throw new ApplicationException(SessionErrorCodes.WITHDRAW_SELLER_AMOUNT);
+
+        try {
+            //Do not check if user is banned or freezed, because that checking is for buyers only
+            Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE);
+            List<Long> speedTestIds = speedTestRepository.findSpeedTestsByUserId(sessionRequest.getUserId(), pageable)
+                    .stream()
+                    .map(SpeedTest::getId)
+                    .collect(Collectors.toList());
+
+            Date finishedAt = new Date(System.currentTimeMillis());
+            sessionRepository.updatePreviousSessionsFinishTimeIfNull(speedTestIds, finishedAt);
+
+            //Everything is fine, so encrypt the password
+            String encryptedString = AESUtils.encrypt(sessionRequest.getWifiPassword(), businessAESSecretKey);
+            Session session = new Session();
+            session.setSpeedTest(speedTest);
+            session.setData(sessionRequest.getData());
+            session.setWifiPassword(encryptedString);
+            session.setPrice(sessionRequest.getPrice());
+            return sessionRepository.save(session);
+        } catch (Exception e) {
+            log.error("Error Occurred ", e);
+            throw new ApplicationException(SessionErrorCodes.UNEXPECTED_SESSION_ERROR);
+        }*/
         return null;
     }
 

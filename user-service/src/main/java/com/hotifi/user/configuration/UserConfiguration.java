@@ -17,9 +17,11 @@ import com.hotifi.user.services.interfaces.IUserService;
 import com.hotifi.user.services.interfaces.IUserStatusService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.kafka.core.KafkaTemplate;
 
 @Configuration
+@EnableJpaRepositories(basePackages = {"com.hotifi.user.repositories", "com.hotifi.authentication.repositories"})
 public class UserConfiguration {
 
     @Bean

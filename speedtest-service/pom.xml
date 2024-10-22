@@ -9,7 +9,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>session-service</artifactId>
+    <artifactId>speedtest-service</artifactId>
 
     <dependencies>
         <dependency>
@@ -20,11 +20,6 @@
         <dependency>
             <groupId>com.hotifi</groupId>
             <artifactId>user-service</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.hotifi</groupId>
-            <artifactId>speedtest-service</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>

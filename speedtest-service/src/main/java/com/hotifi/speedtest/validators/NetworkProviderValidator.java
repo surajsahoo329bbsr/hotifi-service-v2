@@ -1,6 +1,6 @@
-package com.hotifi.session.validators;
+package com.hotifi.speedtest.validators;
 
-import com.hotifi.session.constants.codes.NetworkProviderCodes;
+import com.hotifi.speedtest.constants.codes.NetworkProviderCodes;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

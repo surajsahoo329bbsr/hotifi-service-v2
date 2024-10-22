@@ -1,4 +1,6 @@
-package com.hotifi.session.validators;
+package com.hotifi.speedtest.validators;
+
+import com.hotifi.speedtest.validators.NetworkProviderValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

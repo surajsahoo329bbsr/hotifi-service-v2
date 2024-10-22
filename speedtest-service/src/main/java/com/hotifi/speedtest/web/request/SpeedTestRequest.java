@@ -1,7 +1,7 @@
-package com.hotifi.session.web.request;
+package com.hotifi.speedtest.web.request;
 
 import com.hotifi.common.constants.BusinessConstants;
-import com.hotifi.session.validators.NetworkProvider;
+import com.hotifi.speedtest.validators.NetworkProvider;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;

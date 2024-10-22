@@ -1,12 +1,12 @@
-package com.hotifi.session.web.controller;
+package com.hotifi.speedtest.web.controller;
 
 import com.hotifi.common.constants.ApplicationConstants;
 import com.hotifi.common.constants.SuccessMessages;
 import com.hotifi.common.exception.errors.ErrorMessages;
 import com.hotifi.common.exception.errors.ErrorResponse;
-import com.hotifi.session.entities.SpeedTest;
-import com.hotifi.session.services.interfaces.ISpeedTestService;
-import com.hotifi.session.web.request.SpeedTestRequest;
+import com.hotifi.speedtest.entities.SpeedTest;
+import com.hotifi.speedtest.services.interfaces.ISpeedTestService;
+import com.hotifi.speedtest.web.request.SpeedTestRequest;
 import io.swagger.annotations.*;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -2,6 +2,7 @@ package com.hotifi.user.validators;
 
 import com.hotifi.authentication.entities.Authentication;
 import com.hotifi.authentication.errors.codes.AuthenticationErrorCodes;
+import com.hotifi.common.constants.BusinessConstants;
 import com.hotifi.common.exception.ApplicationException;
 import com.hotifi.user.entitiies.User;
 import com.hotifi.user.errors.codes.UserErrorCodes;
@@ -33,6 +34,34 @@ public class UserStatusValidator {
         return false;
     }
 
+    //Check if seller is deleted / activated / has linked account id
+    public static boolean isSellerLegit(User seller, Authentication authentication, boolean isLinkedAccountIdMandatory) {
+        if (seller == null)
+            return false;
+        if (authentication.isDeleted())
+            throw new ApplicationException(UserErrorCodes.USER_DELETED);
+        if (!seller.isLoggedIn())
+            throw new ApplicationException(UserErrorCodes.USER_NOT_LOGGED_IN);
+        if (seller.getBankAccountId() == null && isLinkedAccountIdMandatory)
+            throw new ApplicationException(UserErrorCodes.USER_LINKED_ACCOUNT_ID_NULL);
+        return true;
+    }
+
+    //Check if seller is deleted / activated / has upi id
+    public static boolean isSellerUPILegit(User seller, Authentication authentication, boolean isUpiIdMandatory) {
+        if (seller == null)
+            return false;
+        if (authentication.isDeleted())
+            throw new ApplicationException(UserErrorCodes.USER_DELETED);
+        if (!seller.isLoggedIn())
+            throw new ApplicationException(UserErrorCodes.USER_NOT_LOGGED_IN);
+        if (seller.getUpiId() == null && isUpiIdMandatory)
+            throw new ApplicationException(UserErrorCodes.USER_UPI_ID_NULL);
+        if(isUpiIdMandatory && !seller.getUpiId().matches(BusinessConstants.VALID_UPI_PATTERN))
+            throw new ApplicationException(UserErrorCodes.USER_UPI_ID_INVALID);
+        return true;
+    }
+
     //Check if buyer is logged in / deleted / activated / freezed / banned / has upi id
     //TODO add this in Transaction-Module
     /*public static boolean isBuyerLegit(User buyer, Authentication authentication) {
@@ -51,33 +80,7 @@ public class UserStatusValidator {
         return true;
     }
 
-    //Check if seller is deleted / activated / has upi id
-    public static boolean isSellerUpiLegit(User seller, Authentication authentication, boolean isUpiIdMandatory) {
-        if (seller == null)
-            return false;
-        if (authentication.isDeleted())
-            throw new ApplicationException(UserErrorCodes.USER_DELETED);
-        if (!seller.isLoggedIn())
-            throw new ApplicationException(UserErrorCodes.USER_NOT_LOGGED_IN);
-        if (seller.getUpiId() == null && isUpiIdMandatory)
-            throw new ApplicationException(UserErrorCodes.USER_UPI_ID_NULL);
-        if(isUpiIdMandatory && !seller.getUpiId().matches(BusinessConstants.VALID_UPI_PATTERN))
-            throw new ApplicationException(UserErrorCodes.USER_UPI_ID_INVALID);
-        return true;
-    }
 
-    //Check if seller is deleted / activated / has linked account id
-    public static boolean isSellerLegit(User seller, Authentication authentication, boolean isLinkedAccountIdMandatory) {
-        if (seller == null)
-            return false;
-        if (authentication.isDeleted())
-            throw new ApplicationException(UserErrorCodes.USER_DELETED);
-        if (!seller.isLoggedIn())
-            throw new ApplicationException(UserErrorCodes.USER_NOT_LOGGED_IN);
-        if (seller.getBankAccount().getLinkedAccountId() == null && isLinkedAccountIdMandatory)
-            throw new ApplicationException(UserErrorCodes.USER_LINKED_ACCOUNT_ID_NULL);
-        return true;
-    }
 
     public static boolean isSellerLegitByAdmin(User seller, String linkedAccountId, String errorDescription) {
         if (seller == null)

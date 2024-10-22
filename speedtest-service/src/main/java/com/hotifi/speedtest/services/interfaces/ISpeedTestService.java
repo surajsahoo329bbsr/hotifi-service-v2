@@ -1,7 +1,7 @@
-package com.hotifi.session.services.interfaces;
+package com.hotifi.speedtest.services.interfaces;
 
-import com.hotifi.session.entities.SpeedTest;
-import com.hotifi.session.web.request.SpeedTestRequest;
+import com.hotifi.speedtest.entities.SpeedTest;
+import com.hotifi.speedtest.web.request.SpeedTestRequest;
 
 import java.util.List;
 

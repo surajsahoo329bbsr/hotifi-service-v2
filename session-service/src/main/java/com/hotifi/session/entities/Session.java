@@ -60,6 +60,6 @@ public class Session implements Serializable {
 
     //@OneToMany(mappedBy = "session", fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<Long> purchaseOrders;
+    private List<Long> purchaseOrderIds;
 
 }

@@ -11,7 +11,6 @@
       <set>
         <option value="$PROJECT_DIR$/offer-service/pom.xml" />
         <option value="$PROJECT_DIR$/payment-service/pom.xml" />
-        <option value="$PROJECT_DIR$/speedtest-service/pom.xml" />
       </set>
     </option>
   </component>

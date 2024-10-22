@@ -20,6 +20,7 @@
         <module>user-service</module>
         <module>common-service</module>
         <module>session-service</module>
+        <module>speedtest-service</module>
     </modules>
 
     <dependencies>

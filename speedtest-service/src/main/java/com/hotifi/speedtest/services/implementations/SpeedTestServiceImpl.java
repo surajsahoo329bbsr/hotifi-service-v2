@@ -1,17 +1,17 @@
-package com.hotifi.session.services.implementations;
+package com.hotifi.speedtest.services.implementations;
 
 import com.hotifi.authentication.entities.Authentication;
 import com.hotifi.common.constants.BusinessConstants;
 import com.hotifi.common.exception.ApplicationException;
-import com.hotifi.session.constants.codes.NetworkProviderCodes;
-import com.hotifi.session.entities.SpeedTest;
-import com.hotifi.session.errors.codes.SpeedTestErrorCodes;
-import com.hotifi.session.repositories.SpeedTestRepository;
-import com.hotifi.session.services.interfaces.ISpeedTestService;
-import com.hotifi.session.web.request.SpeedTestRequest;
+import com.hotifi.speedtest.constants.codes.NetworkProviderCodes;
+import com.hotifi.speedtest.entities.SpeedTest;
+import com.hotifi.speedtest.errors.codes.SpeedTestErrorCodes;
+import com.hotifi.speedtest.repositories.SpeedTestRepository;
+import com.hotifi.speedtest.services.interfaces.ISpeedTestService;
+import com.hotifi.speedtest.web.request.SpeedTestRequest;
 import com.hotifi.user.entitiies.User;
-import com.hotifi.user.repositories.UserRepository;
 import com.hotifi.user.errors.codes.UserErrorCodes;
+import com.hotifi.user.repositories.UserRepository;
 import com.hotifi.user.validators.UserStatusValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +28,6 @@ public class SpeedTestServiceImpl implements ISpeedTestService {
 
     private final UserRepository userRepository;
     private final SpeedTestRepository speedTestRepository;
-    @Autowired
-    private RestTemplate restTemplate;
 
     public SpeedTestServiceImpl(UserRepository userRepository, SpeedTestRepository speedTestRepository) {
         this.userRepository = userRepository;
@@ -51,6 +49,8 @@ public class SpeedTestServiceImpl implements ISpeedTestService {
         }
 
         User user = userRepository.findById(speedTestRequest.getUserId()).orElse(null);
+
+        RestTemplate restTemplate = new RestTemplate();
         Authentication authentication = restTemplate.getForObject("http://localhost:8080/authenticate/" + user.getAuthenticationId(), Authentication.class);
 
         if (UserStatusValidator.isUserStatusInvalid(user, authentication) && !user.isLoggedIn())

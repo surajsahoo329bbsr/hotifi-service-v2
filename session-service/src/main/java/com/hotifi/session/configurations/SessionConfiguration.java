@@ -4,7 +4,7 @@ import com.hotifi.session.repositories.SessionRepository;
 import com.hotifi.session.repositories.SpeedTestRepository;
 import com.hotifi.session.services.implementations.SessionServiceImpl;
 import com.hotifi.session.services.interfaces.ISessionService;
-import com.hotifi.session.services.interfaces.ISpeedTestService;
+import com.hotifi.speedtest.services.interfaces.ISpeedTestService;
 import com.hotifi.user.repositories.UserRepository;
 import com.hotifi.user.services.interfaces.INotificationService;
 import com.hotifi.user.services.interfaces.IUserStatusService;
