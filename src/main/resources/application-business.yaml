@@ -1,0 +1,65 @@
+business:
+  bank-account: Hotifi
+  commission-percentage: 20
+  unit-gb-in-mb: 1024
+  unit-inr-currency-in-paise: 100
+  currency-inr: INR
+
+  pattern:
+    wifi:
+      password-pattern: "(?=^.{20}$)(?=(.*\\d){4,6})(?=(.*[A-Z]){4,6})(?=(.*[a-z]){4,6})(?=(.*[!@#$%^&*?]){6})(?!.*[\\s])^.*"
+      encryption-algorithm: AES
+    valid:
+      url: "((http|https)://)(www.)?[a-zA-Z0-9@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)"
+      upi: "^[\\w.-]+@[\\w.-]+$"
+      otp: "^[0-9]{4,7}$"
+      phone: "^[0-9]{10,15}$"
+      username: "^(?=[a-zA-Z0-9._]{6,30}$)(?!.*[_.]{2})[^_.].*[^_.]$"
+      country-code: "^[0-9]{1,5}$"
+      role: "(BUYER|SELLER|DELETE)"
+      epoch-to-date: "yyyy-MM-dd HH:mm:ss"
+    capital_letters: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    referral_code_length: 10
+    referral_code_prefix: "REF"
+
+  range:
+    minimum:
+      download-speed-in-mb: 0.5
+      upload-speed-in-mb: 0.125
+      wifi-download-speed-in-mb: 0.625D
+      wifi-upload-speed-in-mb: 0.156D
+      data-used-in-mb: 0.00
+      selling-data-in-mb: 100
+      buying-data-in-mb:  10
+      selling-data-price-per-gb: 7
+      data-threshold-mb: 5
+      withdrawal-amount-before-maturity: 20 #If this happens within 20 days or later
+      seller-withdrawal-in-hours: 720 # 20 days period
+      withdrawal-amount: 1 #If this happens after 20 days
+      purchase-amount: 0
+      price-budget-per-offer: 1
+      suspension-period-in-hours: 24
+    maximum:
+      selling-data-mb: 204800 # 200 GB
+      selling-data-price-per-gb: 21
+      withdrawal-amount: 10000
+      seller-amount-earned: 20000
+      email-otp-minutes: 10
+      seller-session-close-wait-time-minutes: 1
+      buyer-refund-due-hours: 168 # 7 days refund policy
+      tolerable-abnormal-activity-seconds: 60 # 7 days refund policy
+
+  value-codes:
+    start:
+      buyer-payment: 0
+      seller-payment: 1000
+      payment-method: 100
+      cloud-client: 100
+      social: 100
+      razorpay-order-status: 100
+      razorpay-payment-status: 0
+      razorpay-refund-status: 0
+      payment-gateway: 1
+      account-type: 1
+      network-provider: 1
+      bank-account-type: 1

@@ -1,0 +1,12 @@
+server:
+  servlet:
+    context-path: /session/
+  port: 5004
+  error:
+    include-stacktrace: never
+    include-message: always
+    include-binding-errors: always
+
+spring:
+  config:
+    import: "C:/Users/Suraj.000/IdeaProjects/hotifi-service-v2/src/main/resources/application.yaml"

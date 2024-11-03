@@ -12,9 +12,8 @@ import com.hotifi.speedtest.web.request.SpeedTestRequest;
 import com.hotifi.user.entitiies.User;
 import com.hotifi.user.errors.codes.UserErrorCodes;
 import com.hotifi.user.repositories.UserRepository;
-import com.hotifi.user.validators.UserStatusValidator;
+import com.hotifi.user.validators.UserValidatorUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -51,9 +50,9 @@ public class SpeedTestServiceImpl implements ISpeedTestService {
         User user = userRepository.findById(speedTestRequest.getUserId()).orElse(null);
 
         RestTemplate restTemplate = new RestTemplate();
-        Authentication authentication = restTemplate.getForObject("http://localhost:8080/authenticate/" + user.getAuthenticationId(), Authentication.class);
+        Authentication authentication = restTemplate.getForObject("http://localhost:5001/authentication/" + user.getAuthenticationId(), Authentication.class);
 
-        if (UserStatusValidator.isUserStatusInvalid(user, authentication) && !user.isLoggedIn())
+        if (UserValidatorUtils.isUserInvalid(user, authentication) && !user.isLoggedIn())
             throw new ApplicationException(UserErrorCodes.USER_NOT_LEGIT);
         try {
             SpeedTest speedTest = new SpeedTest();

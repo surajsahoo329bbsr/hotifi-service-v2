@@ -9,6 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.hotifi.user", "com.hotifi.authentication"})
 public class UserApplication extends SpringBootServletInitializer {
+
     public static void main(String[] args) {
         SpringApplication.run(UserApplication.class, args);
     }

@@ -1,6 +1,6 @@
 package com.hotifi.session.repositories;
 
-import com.hotifi.session.entities.SpeedTest;
+import com.hotifi.speedtest.entities.SpeedTest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;

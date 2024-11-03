@@ -1,0 +1,50 @@
+# Hotifi Configuration
+app:
+  version: "v1"
+  name: "Hotifi"
+direct-transfer-api-enabled: false
+
+firebase-service-account-path: "C:\\Users\\Suraj.000\\IdeaProjects\\hotifi-service-v2\\user-service\\src\\main\\resources\\firebase_service_account.yaml"
+application:
+  environment:
+    file-directory: "C:\\Users\\Suraj.000\\Desktop\\hotifi-app"
+    filename: "hotifi-secrets-pwds.env"
+
+# Email Paths
+email:
+  otp-html-path: "static/email_otp.html"
+  welcome-html-path: "static/welcome.html"
+  account:
+    deleted-html-path: "static/account_deleted.html"
+    frozen-html-path: "static/account_freezed.html"
+    buyer-banned-html-path: "static/buyer_banned.html"
+    linked-account-failed-path: "static/linked_account_failed.html"
+    linked-account-success-path: "static/linked_account_success.html"
+
+# Swagger Configuration
+user-tag: "user"
+speed-test-tag: "speed-test"
+notification-tag: "notification"
+user-status-tag: "user-status"
+email-tag: "email"
+device-tag: "device"
+session-tag: "session"
+purchase-tag: "purchase"
+bank-account-tag: "bank-account"
+offer-tag: "offer"
+referrer-tag: "referrer"
+referent-tag: "referent"
+payment-tag: "payment"
+stats-tag: "stats"
+feedback-tag: "feedback"
+authentication-tag: "authenticate"
+
+# Policy URLs
+privacy-policy-url: "https://hotifi.com/privacy-policy.html"
+facebook-deletion-status-reason: "We use your first name, last name and email address for legal reasons as these are involved in financial transactions. To read more please read our privacy policy in below url"
+
+# Kafka Topics
+kafka:
+  email:
+    topic: "email-notifications"
+    group-id: "email-group"

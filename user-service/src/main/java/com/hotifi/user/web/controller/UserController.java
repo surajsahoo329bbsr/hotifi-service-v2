@@ -34,7 +34,6 @@ import javax.validation.constraints.Pattern;
 @Validated
 @RestController
 @Api(tags = ApplicationConstants.USER_TAG)
-@RequestMapping(path = "/user")
 public class UserController {
 
     @Autowired

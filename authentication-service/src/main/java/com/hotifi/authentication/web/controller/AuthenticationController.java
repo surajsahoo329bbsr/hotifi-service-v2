@@ -30,7 +30,6 @@ import javax.validation.constraints.Pattern;
 @Validated
 @RestController
 @Api(tags = ApplicationConstants.AUTHENTICATION_TAG)
-@RequestMapping(path = "/authenticate")
 public class AuthenticationController {
 
     @Autowired

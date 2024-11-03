@@ -23,7 +23,6 @@ import java.util.List;
 @Validated
 @RestController
 @Api(tags = ApplicationConstants.SPEED_TEST_TAG)
-@RequestMapping(path = "/speed-test")
 public class SpeedTestController {
 
     @Autowired

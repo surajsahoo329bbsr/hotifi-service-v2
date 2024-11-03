@@ -35,19 +35,22 @@ public class BusinessConstants {
     public static final String MINIMUM_DATA_USED_MB = "0.00";
     public static final int MINIMUM_SELLING_DATA_MB = 100; //100 MB
     public static final int MINIMUM_BUYING_DATA_MB = 10; //100 MB
-    public static final int MAXIMUM_SELLING_DATA_MB = 204800; //200 GB
+
     public static final int MINIMUM_SELLING_DATA_PRICE_PER_GB = 7;
-    public static final int MAXIMUM_SELLING_DATA_PRICE_PER_GB = 21;
     public static final int MINIMUM_DATA_THRESHOLD_MB = 5;
     public static final int MINIMUM_WITHDRAWAL_AMOUNT_BEFORE_MATURITY = 20; //If this happens within 20 days or later
-    public static final int MAXIMUM_WITHDRAWAL_AMOUNT = 10000;
-    public static final int MAXIMUM_SELLER_AMOUNT_EARNED = 20000;
-    public static final int MAXIMUM_EMAIL_OTP_MINUTES = 10;
     public static final int MINIMUM_SELLER_WITHDRAWAL_HOURS = 24 * 20; //24 hours - 20 days
     public static final int MINIMUM_WITHDRAWAL_AMOUNT = 1; //If this happens after 20 days
     public static final int MINIMUM_PURCHASE_AMOUNT = 0;
     public static final int MINIMUM_PRICE_BUDGET_PER_OFFER = 1;
     public static final int MINIMUM_FREEZE_PERIOD_HOURS = 24;
+
+
+    public static final int MAXIMUM_SELLING_DATA_MB = 204800; //200 GB
+    public static final int MAXIMUM_SELLING_DATA_PRICE_PER_GB = 21;
+    public static final int MAXIMUM_WITHDRAWAL_AMOUNT = 10000;
+    public static final int MAXIMUM_SELLER_AMOUNT_EARNED = 20000;
+    public static final int MAXIMUM_EMAIL_OTP_MINUTES = 10;
     public static final int SELLER_SESSION_CLOSE_WAIT_TIME_MINUTES = 1;
     public static final int MAXIMUM_BUYER_REFUND_DUE_HOURS = 168; // 7 days refund policy
     public static final int MAXIMUM_TOLERABLE_ABNORMAL_ACTIVITY_SECONDS = 60; // 7 days refund policy

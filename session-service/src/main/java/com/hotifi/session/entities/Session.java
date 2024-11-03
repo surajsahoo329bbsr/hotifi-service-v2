@@ -2,6 +2,7 @@ package com.hotifi.session.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hotifi.common.constants.BusinessConstants;
+import com.hotifi.speedtest.entities.SpeedTest;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,9 +21,9 @@ public class Session implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "speed_test_id", nullable = false)
+    @JsonIgnore
     private SpeedTest speedTest;
 
     @Column(nullable = false)
@@ -59,7 +60,7 @@ public class Session implements Serializable {
     private Date finishedAt;
 
     //@OneToMany(mappedBy = "session", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<Long> purchaseOrderIds;
+    //@JsonIgnore
+    //private List<Long> purchaseOrderIds;
 
 }

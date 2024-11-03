@@ -21,6 +21,8 @@
         <module>common-service</module>
         <module>session-service</module>
         <module>speedtest-service</module>
+        <module>transaction-service</module>
+        <module>feedback-module</module>
     </modules>
 
     <dependencies>

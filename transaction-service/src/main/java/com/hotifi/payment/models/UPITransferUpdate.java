@@ -1,4 +1,4 @@
-package com.hotifi.session.models;
+package com.hotifi.payment.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

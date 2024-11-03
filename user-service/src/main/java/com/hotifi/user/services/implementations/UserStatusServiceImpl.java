@@ -98,7 +98,7 @@ public class UserStatusServiceImpl implements IUserStatusService {
                 if (userStatuses.size() == BusinessConfigurations.MINIMUM_WARNINGS_TO_FREEZE - 1) {
                     //freeze
                     if (userStatusRequest.getFreezeReason() == null)
-                        throw new HotifiException(UserStatusErrorCodes.USER_FREEZE_REASON_ABSENT);
+                        throw new ApplicationException(UserStatusErrorCodes.USER_FREEZE_REASON_ABSENT);
                     userStatus.setFreezeReason(userStatusRequest.getFreezeReason());
                     userStatus.setFreezeCreatedAt(now);
                     userStatus.setFreezePeriod(BusinessConfigurations.MINIMUM_FREEZE_PERIOD_HOURS); //24 hours
@@ -106,7 +106,7 @@ public class UserStatusServiceImpl implements IUserStatusService {
                 } else if (userStatuses.size() == BusinessConfigurations.MINIMUM_WARNINGS_TO_BAN - 1) {
                     //ban
                     if (userStatusRequest.getBanReason() == null)
-                        throw new HotifiException(UserStatusErrorCodes.USER_BAN_REASON_ABSENT);
+                        throw new ApplicationException(UserStatusErrorCodes.USER_BAN_REASON_ABSENT);
                     userStatus.setBanReason(userStatusRequest.getBanReason());
                     userStatus.setBanCreatedAt(now);
                     banUser(userId, true);

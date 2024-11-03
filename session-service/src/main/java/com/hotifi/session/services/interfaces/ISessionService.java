@@ -14,6 +14,8 @@ public interface ISessionService {
 
     Session addSession(SessionRequest sessionRequest);
 
+    void updateSession(Session session);
+
     List<ActiveSessionsResponse> getActiveSessions(Set<String> usernames);
 
     List<ActiveSessionsResponse> getActiveSessionsInDistrict(String postalCode);

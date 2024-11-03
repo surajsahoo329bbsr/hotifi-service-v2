@@ -17,7 +17,7 @@ import com.hotifi.user.events.UserEvent;
 import com.hotifi.user.repositories.UserRepository;
 import com.hotifi.user.services.interfaces.INotificationService;
 import com.hotifi.user.services.interfaces.IUserService;
-import com.hotifi.user.validators.UserStatusValidator;
+import com.hotifi.user.validators.UserValidatorUtils;
 import com.hotifi.user.web.request.UserRequest;
 import com.hotifi.user.web.response.CredentialsResponse;
 import com.hotifi.user.web.response.FacebookDeletionResponse;
@@ -128,7 +128,7 @@ public class UserServiceImpl implements IUserService {
         User user = authentication != null ? userRepository.findByAuthenticationId(authentication.getId()) : null;
         if (user == null)
             throw new ApplicationException(UserErrorCodes.USER_NOT_FOUND);
-        if (UserStatusValidator.isAuthenticationStatusInvalid(authentication))
+        if (UserValidatorUtils.isAuthenticationStatusInvalid(authentication))
             throw new ApplicationException(AuthenticationErrorCodes.AUTHENTICATION_NOT_LEGIT);
 
         boolean isSocialUserVerified = isSocialLogin && verificationService.isSocialUserVerified(email, identifier, token, socialCode);
@@ -163,7 +163,7 @@ public class UserServiceImpl implements IUserService {
         //If user doesn't exist no need to check legit authentication
         if (authentication.getEmailOtp() != null && !OtpUtils.isEmailOtpExpired(authentication))
             throw new ApplicationException(UserErrorCodes.EMAIL_OTP_ALREADY_GENERATED);
-        if (UserStatusValidator.isAuthenticationStatusInvalid(authentication))
+        if (UserValidatorUtils.isAuthenticationStatusInvalid(authentication))
             throw new ApplicationException(AuthenticationErrorCodes.AUTHENTICATION_NOT_LEGIT);
         OtpUtils.generateAuthenticationEmailOtp(authentication, authenticationRepository);
     }
@@ -179,7 +179,7 @@ public class UserServiceImpl implements IUserService {
         User user = authentication != null ? userRepository.findByAuthenticationId(authentication.getId()) : null;
         if (user == null)
             throw new ApplicationException(UserErrorCodes.USER_EXISTS);
-        if (UserStatusValidator.isAuthenticationStatusInvalid(authentication))
+        if (UserValidatorUtils.isAuthenticationStatusInvalid(authentication))
             throw new ApplicationException(AuthenticationErrorCodes.AUTHENTICATION_NOT_LEGIT);
         OtpUtils.generateAuthenticationEmailOtp(authentication, authenticationRepository);
     }
@@ -213,7 +213,7 @@ public class UserServiceImpl implements IUserService {
         Long authenticationId = userRequest.getAuthenticationId();
         Authentication authentication = authenticationRepository.findById(authenticationId).orElse(null);
         User user = userRepository.findByAuthenticationId(authenticationId);
-        if (UserStatusValidator.isUserStatusInvalid(user, authentication) && !user.isLoggedIn())
+        if (UserValidatorUtils.isUserInvalid(user, authentication) && !user.isLoggedIn())
             throw new ApplicationException(UserErrorCodes.USER_NOT_LEGIT);
         setUser(userRequest, user, authenticationId);
         userRepository.save(user);
@@ -224,7 +224,7 @@ public class UserServiceImpl implements IUserService {
     public void updateUserLogin(String email, boolean isLoggedIn) {
         Authentication authentication = authenticationRepository.findByEmail(email);
         User user = authentication != null ? userRepository.findByAuthenticationId(authentication.getId()) : null;
-        if (UserStatusValidator.isUserStatusInvalid(user, authentication))
+        if (UserValidatorUtils.isUserInvalid(user, authentication))
             throw new ApplicationException(UserErrorCodes.USER_NOT_LEGIT);
         Date logTime = new Date(System.currentTimeMillis());
         user.setLoggedIn(isLoggedIn);
@@ -238,7 +238,7 @@ public class UserServiceImpl implements IUserService {
         Authentication authentication = authenticationRepository.findByEmail(email);
         Long authenticationId = (authentication != null) ? authentication.getId() : null;
         User user = userRepository.findByAuthenticationId(authenticationId);
-        if (UserStatusValidator.isUserStatusInvalid(user, authentication))
+        if (UserValidatorUtils.isUserInvalid(user, authentication))
             throw new ApplicationException(UserErrorCodes.USER_NOT_LEGIT);
         return user;
     }

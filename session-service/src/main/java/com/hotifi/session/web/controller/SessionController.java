@@ -28,7 +28,6 @@ import java.util.Set;
 @Validated
 @RestController
 @Api(tags = ApplicationConstants.SESSION_TAG)
-@RequestMapping(path = "/session")
 public class SessionController {
 
     @Autowired
@@ -52,6 +51,23 @@ public class SessionController {
         Session session = //customerAuthorizationService.isAuthorizedByUserId(sessionRequest.getUserId(), AuthorizationUtils.getUserToken()) ?
                 sessionService.addSession(sessionRequest); //: null;
         return new ResponseEntity<>(session, HttpStatus.OK);
+    }
+
+    @PutMapping(path = "/update/", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(
+            value = "Update Session Details",
+            notes = "Update Session Details",
+            response = String.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class),
+            @ApiResponse(code = 200, message = SuccessMessages.OK, response = Session.class)
+    })
+    @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer token", required = true, dataType = "string", paramType = "header"))
+    @PreAuthorize("hasAuthority('CUSTOMER')")
+    public ResponseEntity<?> updateSession(@RequestBody @Validated Session session) {
+         //customerAuthorizationService.isAuthorizedByUserId(sessionRequest.getUserId(), AuthorizationUtils.getUserToken()) ?
+                sessionService.updateSession(session); //: null;
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping(path = "/active/{usernames}", produces = MediaType.APPLICATION_JSON_VALUE)

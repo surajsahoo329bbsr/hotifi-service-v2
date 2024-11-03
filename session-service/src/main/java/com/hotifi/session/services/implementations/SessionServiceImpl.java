@@ -46,6 +46,11 @@ public class SessionServiceImpl implements ISessionService {
     }
 
     @Override
+    public void updateSession(Session session) {
+        sessionRepository.save(session);
+    }
+
+    @Override
     public Session addSession(SessionRequest sessionRequest) {
         /*User user = userRepository.findById(sessionRequest.getUserId()).orElse(null);
         Authentication authentication = restTemplate.getForObject("http://localhost:8080/authenticate/" + user.getAuthenticationId(), Authentication.class);
@@ -362,7 +367,7 @@ public class SessionServiceImpl implements ISessionService {
         //TODO TBC if preference to be given to seller or buyer, if buyer has not closed wifi session even after warning
         // has been sent. For now preference has been given to seller,after sending a notification
         //if (!isForceStop && buyers != null && buyers.size() > 0)
-            //throw new HotifiException(SessionErrorCodes.NOTIFY_BUYERS_TO_FINISH_SESSION);
+            //throw new ApplicationException(SessionErrorCodes.NOTIFY_BUYERS_TO_FINISH_SESSION);
 
         User buyer = userRepository.findById(session.getSpeedTest().getUser().getId()).orElse(null);
         if (LegitUtils.isBuyerLegit(buyer)) {
@@ -371,7 +376,7 @@ public class SessionServiceImpl implements ISessionService {
             User seller = session.getSpeedTest().getUser();
             notificationService.sendNotificationToSingleUser(seller.getId(), "Hotspot Stopped", "Wifi Hotspot Stopped", CloudClientCodes.GOOGLE_CLOUD_PLATFORM);
         } else {
-            throw new HotifiException(UserErrorCodes.USER_NOT_LEGIT);
+            throw new ApplicationException(UserErrorCodes.USER_NOT_LEGIT);
         }
     }
 
@@ -380,10 +385,10 @@ public class SessionServiceImpl implements ISessionService {
     public BigDecimal calculatePaymentForDataToBeUsed(Long sessionId, int dataToBeUsed) {
         Session session = sessionRepository.findById(sessionId).orElse(null);
         if (session == null)
-            throw new HotifiException(PurchaseErrorCodes.SESSION_NOT_FOUND);
+            throw new ApplicationException(PurchaseErrorCodes.SESSION_NOT_FOUND);
         double availableData = session.getData() - session.getDataUsed();
         if (Double.compare(dataToBeUsed, availableData) > 0)
-            throw new HotifiException(PurchaseErrorCodes.EXCESS_DATA_TO_BUY_ERROR);
+            throw new ApplicationException(PurchaseErrorCodes.EXCESS_DATA_TO_BUY_ERROR);
         //return Math.ceil(session.getPrice() / Constants.UNIT_GB_VALUE_IN_MB * dataToBeUsed);
         return PaymentUtils.divideThenMultiplyCeilingZeroScale(session.getPrice(), BigDecimal.valueOf(BusinessConfigurations.UNIT_GB_VALUE_IN_MB), BigDecimal.valueOf(dataToBeUsed));
     }
@@ -392,7 +397,7 @@ public class SessionServiceImpl implements ISessionService {
     public SessionSummaryResponse getSessionSummary(Long sessionId) {
         Session session = sessionRepository.findById(sessionId).orElse(null);
         if (session == null)
-            throw new HotifiException(PurchaseErrorCodes.SESSION_NOT_FOUND);
+            throw new ApplicationException(PurchaseErrorCodes.SESSION_NOT_FOUND);
         try {
             Date finishedAt = new Date(System.currentTimeMillis());
             List<Buyer> buyers = getBuyers(sessionId, false);
@@ -422,7 +427,7 @@ public class SessionServiceImpl implements ISessionService {
             sessionSummaryResponse.setNetEarnings(netEarnings);
             return sessionSummaryResponse;
         } catch (Exception e) {
-            throw new HotifiException(SessionErrorCodes.UNEXPECTED_SESSION_ERROR);
+            throw new ApplicationException(SessionErrorCodes.UNEXPECTED_SESSION_ERROR);
         }
     }
 
@@ -445,7 +450,7 @@ public class SessionServiceImpl implements ISessionService {
 
         } catch (Exception e) {
             log.error("Exception ", e);
-            throw new HotifiException(SessionErrorCodes.UNEXPECTED_SESSION_ERROR);
+            throw new ApplicationException(SessionErrorCodes.UNEXPECTED_SESSION_ERROR);
         }
     }
 
@@ -467,7 +472,7 @@ public class SessionServiceImpl implements ISessionService {
             return getSessionSummaryResponses(speedTestIds, sortedPageableByDataUsed);
         } catch (Exception e) {
             log.error("Exception ", e);
-            throw new HotifiException(SessionErrorCodes.UNEXPECTED_SESSION_ERROR);
+            throw new ApplicationException(SessionErrorCodes.UNEXPECTED_SESSION_ERROR);
         }
     }
 
