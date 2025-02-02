@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,7 +42,7 @@ public class StatsController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = SellerStatsResponse.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
     public ResponseEntity<?> getSellerStats(@PathVariable("user-id") @Range(min = 1, message = "{seller.id.invalid}") Long id) {
         SellerStatsResponse sellerStatsResponse =
                 //AuthorizationUtils.isAdministratorRole() || customerAuthorizationService.isAuthorizedByUserId(id, AuthorizationUtils.getUserToken()) ?
@@ -61,7 +60,7 @@ public class StatsController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = BuyerStatsResponse.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
     public ResponseEntity<?> getBuyerStats(@PathVariable("user-id") @Range(min = 1, message = "{buyer.id.invalid}") Long id) {
         BuyerStatsResponse buyerStatsResponse =
                 //AuthorizationUtils.isAdministratorRole() || customerAuthorizationService.isAuthorizedByUserId(id, AuthorizationUtils.getUserToken()) ?

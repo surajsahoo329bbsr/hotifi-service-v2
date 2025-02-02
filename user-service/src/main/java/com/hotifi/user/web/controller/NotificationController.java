@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,7 +39,7 @@ public class NotificationController {
             response = String.class)
     @ApiResponses(value = @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class))
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('ADMINISTRATOR')")
+    //@PreAuthorize("hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<?> sendNotificationToSingleUser(@RequestBody @Validated NotificationRequest notificationRequest) {
         notificationService.sendNotificationToSingleUser(notificationRequest.getUserId(),
                 notificationRequest.getTitle(), notificationRequest.getMessage(), CloudClientCodes.GOOGLE_CLOUD_PLATFORM);
@@ -56,7 +55,7 @@ public class NotificationController {
             response = String.class)
     @ApiResponses(value = @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class))
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('ADMINISTRATOR')")
+    //@PreAuthorize("hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<?> sendTestEmail() {
         User user = new User();
         user.setFirstName("Suraj");
@@ -76,7 +75,7 @@ public class NotificationController {
             response = String.class)
     @ApiResponses(value = @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class))
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('ADMINISTRATOR')")
+    //@PreAuthorize("hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<?> sendNotificationToMultipleUsers(@RequestBody @Validated NotificationAllRequest notificationAllRequest) {
         notificationService.sendPhotoNotificationsToMultipleUsers(
                 notificationAllRequest.getUserIds(), notificationAllRequest.getNotificationCommonRequest().getTitle(),
@@ -93,7 +92,7 @@ public class NotificationController {
             response = String.class)
     @ApiResponses(value = @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class))
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('ADMINISTRATOR')")
+    //@PreAuthorize("hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<?> sendNotificationToAllUsers(@RequestBody @Validated NotificationCommonRequest notificationCommonRequest) {
         notificationService.sendPhotoNotificationsToAllUsers(
                 notificationCommonRequest.getTitle(), notificationCommonRequest.getMessage(),

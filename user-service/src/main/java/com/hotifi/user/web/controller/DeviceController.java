@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,7 +42,7 @@ public class DeviceController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = Device.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> getDeviceByAndroidId(@PathVariable(value = "android-id")
                                                   @NotBlank(message = "{android.id.blank}")
                                                   @Length(max = 255, message = "{android.id.invalid}") String androidId) {
@@ -60,7 +59,7 @@ public class DeviceController {
             response = String.class)
     @ApiResponses(value = @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class))
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> addDevice(@RequestBody @Validated DeviceRequest deviceRequest) {
         //if ((customerAuthorizationService.isAuthorizedByUserId(deviceRequest.getUserId(), AuthorizationUtils.getUserToken())))
             deviceService.addDevice(deviceRequest);
@@ -75,7 +74,7 @@ public class DeviceController {
             response = String.class)
     @ApiResponses(value = @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class))
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> updateDevice(@RequestBody @Validated DeviceRequest deviceRequest) {
         //if (customerAuthorizationService.isAuthorizedByAndroidId(deviceRequest.getAndroidId(), AuthorizationUtils.getUserToken()))
             deviceService.updateDevice(deviceRequest);
@@ -90,7 +89,7 @@ public class DeviceController {
             response = String.class)
     @ApiResponses(value = @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class))
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> deleteUserDevices(@PathVariable("user-id") @Range(min = 1, message = "{user.id.invalid}") Long userId) {
         //if (customerAuthorizationService.isAuthorizedByUserId(userId, AuthorizationUtils.getUserToken()))
             deviceService.deleteUserDevices(userId);

@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,7 +43,7 @@ public class UserStatusController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = UserStatus.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> addUserStatus(@RequestBody @Validated UserStatusRequest userStatusRequest) {
         List<UserStatus> userStatus = //customerAuthorizationService.isAuthorizedByUserId(userStatusRequest.getUserId(), AuthorizationUtils.getUserToken()) ?
                 userStatusService.addUserStatus(userStatusRequest); //: null;
@@ -61,7 +60,7 @@ public class UserStatusController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = UserStatus.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
     public ResponseEntity<?> getUserStatusByUserId(@PathVariable(value = "user-id") @Range(min = 1, message = "{user.id.invalid}") Long userId) {
         List<UserStatus> userStatuses = //(AuthorizationUtils.isAdministratorRole() ||
                 //customerAuthorizationService.isAuthorizedByUserId(userId, AuthorizationUtils.getUserToken())) ?
@@ -77,7 +76,7 @@ public class UserStatusController {
             response = String.class)
     @ApiResponses(value = @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class))
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> freezeUser(@PathVariable(value = "user-id") @Range(min = 1, message = "{user.id.invalid}") Long userId) {
         //if (customerAuthorizationService.isAuthorizedByUserId(userId, AuthorizationUtils.getUserToken()))
         UserEventDTO userEventDTO = userStatusService.freezeUser(userId, false);

@@ -15,6 +15,9 @@ import com.hotifi.user.services.interfaces.INotificationService;
 import com.hotifi.user.services.interfaces.IUserStatusService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
@@ -51,7 +54,15 @@ public class SessionServiceImpl implements ISessionService {
     }
 
     @Override
+    @CachePut(cacheNames = "sessionIdCache", key = "sessionId")
     public Session addSession(SessionRequest sessionRequest) {
+        RedisTemplate<String, Long> redisTemplate = new RedisTemplate<>();
+        //TODO check if Annotation to be used or RedisTemplate
+        if(Boolean.TRUE.equals(redisTemplate.hasKey("sessionId"))){
+
+        } else {
+
+        }
         /*User user = userRepository.findById(sessionRequest.getUserId()).orElse(null);
         Authentication authentication = restTemplate.getForObject("http://localhost:8080/authenticate/" + user.getAuthenticationId(), Authentication.class);
 

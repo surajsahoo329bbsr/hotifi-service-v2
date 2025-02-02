@@ -5,9 +5,11 @@ import com.hotifi.common.constants.ApplicationConstants;
 import com.hotifi.common.constants.BusinessConstants;
 import com.hotifi.common.constants.SuccessMessages;
 import com.hotifi.authentication.entities.Authentication;
+import com.hotifi.common.dto.UserEventDTO;
 import com.hotifi.common.exception.errors.ErrorMessages;
 import com.hotifi.common.exception.errors.ErrorResponse;
 import com.hotifi.authentication.services.interfaces.IAuthenticationService;
+import com.hotifi.common.services.interfaces.IEmailService;
 import com.hotifi.common.validator.SocialClient;
 import com.hotifi.authentication.web.request.EmailOtpRequest;
 import com.hotifi.authentication.web.request.PhoneRequest;
@@ -36,6 +38,9 @@ public class AuthenticationController {
     private IAuthenticationService authenticationService;
 
     @Autowired
+    private IEmailService emailService;
+
+    @Autowired
     private AuthenticationRepository authenticationRepository;
 
     @GetMapping(path = "/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -49,13 +54,27 @@ public class AuthenticationController {
     })
     public ResponseEntity<?> getAuthentication(
             @PathVariable(value = "email")
-            @NotBlank(message = "{email.blank}")
-            @Email(message = "{email.pattern.invalid}") String email) {
+            //@NotBlank(message = "{email.blank}")
+            @Email(message = "{email.pattern.invalid}")
+            String email) {
         Authentication authentication = authenticationService.getAuthentication(email);
         return new ResponseEntity<>(authentication, HttpStatus.OK);
     }
 
-    @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/kafka/{listenerId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(
+            value = "Starts Kafka Listener With ID",
+            notes = "Starts Kafka Listener With ID",
+            code = 204,
+            response = String.class)
+    @ApiResponses(value = @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class))
+    @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
+    public ResponseEntity<?> startKafkaListener(@PathVariable(value = "listenerId") String listenerId) {
+        //boolean isListenerStarted = emailService.startListener(listenerId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Get Authentication Details By Id",
             notes = "Get Authentication Details By Id",
@@ -65,8 +84,7 @@ public class AuthenticationController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = Authentication.class)
     })
     public ResponseEntity<?> getAuthentication(
-            @PathVariable(value = "id")
-            @NotBlank(message = "{id.blank}") Long authenticationId) {
+            @PathVariable(value = "id") Long authenticationId) {
         Authentication authentication = authenticationRepository.findById(authenticationId).orElse(null);
         return new ResponseEntity<>(authentication, HttpStatus.OK);
     }
@@ -96,7 +114,6 @@ public class AuthenticationController {
             @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class),
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = AvailabilityResponse.class)
     })public ResponseEntity<?> isEmailAvailable(@PathVariable(value = "email")
-                                              @NotBlank(message = "{email.blank}")
                                               @Email(message = "{email.invalid}") String email) {
         //No need to check for role security here
         boolean isEmailAvailable = authenticationService.isEmailAvailable(email);
@@ -134,7 +151,6 @@ public class AuthenticationController {
             @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class),
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = CredentialsResponse.class)
     })public ResponseEntity<?> addCustomEmail(@PathVariable(value = "email")
-                                            @NotBlank(message = "{email.blank}")
                                             @Email(message = "{email.pattern.invalid}") String email) {
         CredentialsResponse credentialsResponse = authenticationService.addEmail(email, null, null, null);
         return new ResponseEntity<>(credentialsResponse, HttpStatus.OK);
@@ -148,7 +164,6 @@ public class AuthenticationController {
             response = String.class)
     @ApiResponses(value = @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class))
     public ResponseEntity<?> resendEmailOtpSignUp(@PathVariable(value = "email")
-                                                  @NotBlank(message = "{email.blank}")
                                                   @Email(message = "{email.pattern.invalid}") String email) {
         authenticationService.resendEmailOtpSignUp(email);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

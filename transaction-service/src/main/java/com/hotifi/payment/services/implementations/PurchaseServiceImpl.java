@@ -60,7 +60,7 @@ public class PurchaseServiceImpl implements IPurchaseService {
     @Value("${business.aes.secret-key}")
     private String businessAESSecretKey;
 
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
     public PurchaseServiceImpl(UserRepository userRepository, PurchaseOrderRepository purchaseOrderRepository, PurchaseRepository purchaseRepository, SellerPaymentRepository sellerPaymentRepository, IPaymentService sellerPaymentService) {
         this.userRepository = userRepository;
@@ -78,7 +78,7 @@ public class PurchaseServiceImpl implements IPurchaseService {
         User buyer = userRepository.findById(buyerId).orElse(null);
         Session session = restTemplate.getForObject("http://localhost:5004/session/" + sessionId, Session.class);
 
-        Authentication authentication = restTemplate.getForObject("http://localhost:5001/authentication/" + buyer.getAuthenticationId(), Authentication.class);
+        Authentication authentication = restTemplate.getForObject("http://authentication-service/authentication/" + buyer.getAuthenticationId(), Authentication.class);
 
         if (!PaymentValidatorUtils.isBuyerValid(buyer, authentication))
             throw new ApplicationException(PurchaseErrorCodes.BUYER_NOT_LEGIT);

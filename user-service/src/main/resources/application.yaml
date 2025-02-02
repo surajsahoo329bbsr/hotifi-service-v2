@@ -6,6 +6,16 @@ server:
     include-stacktrace: never
     include-message: always
     include-binding-errors: always
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
 spring:
+  application:
+    name: user-service
+  security:
+    enabled: false
   config:
     import: "C:/Users/Suraj.000/IdeaProjects/hotifi-service-v2/src/main/resources/application.yaml"

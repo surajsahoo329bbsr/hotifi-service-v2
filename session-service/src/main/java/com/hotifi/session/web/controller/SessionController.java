@@ -14,10 +14,10 @@ import com.hotifi.session.web.response.SessionSummaryResponse;
 import io.swagger.annotations.*;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,7 +46,7 @@ public class SessionController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = Session.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> addSession(@RequestBody @Validated SessionRequest sessionRequest) {
         Session session = //customerAuthorizationService.isAuthorizedByUserId(sessionRequest.getUserId(), AuthorizationUtils.getUserToken()) ?
                 sessionService.addSession(sessionRequest); //: null;
@@ -63,7 +63,7 @@ public class SessionController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = Session.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> updateSession(@RequestBody @Validated Session session) {
          //customerAuthorizationService.isAuthorizedByUserId(sessionRequest.getUserId(), AuthorizationUtils.getUserToken()) ?
                 sessionService.updateSession(session); //: null;
@@ -80,7 +80,7 @@ public class SessionController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = ActiveSessionsResponse.class, responseContainer = "List")
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER') or hasAuthority('ADMINISTRATOR')")
+    //@PreAuthorize("hasAuthority('CUSTOMER') or hasAuthority('ADMINISTRATOR')")
     //Any customer / admin can view this no need to check for particular customer
     public ResponseEntity<?> getActiveSessions(@RequestParam(value = "usernames") Set<String> usernames) {
         //Not required to check for role security
@@ -98,7 +98,7 @@ public class SessionController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = ActiveSessionsResponse.class, responseContainer = "List")
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER') or hasAuthority('ADMINISTRATOR')")
+    //@PreAuthorize("hasAuthority('CUSTOMER') or hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<?> getActiveSessionsInDistrict(@PathVariable(value = "postalCode") String postalCode) {
         List<ActiveSessionsResponse> activeSessionsResponses = sessionService.getActiveSessionsInDistrict(postalCode);
         return new ResponseEntity<>(activeSessionsResponses, HttpStatus.OK);
@@ -114,7 +114,7 @@ public class SessionController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = ActiveSessionsResponse.class, responseContainer = "List")
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER') or hasAuthority('ADMINISTRATOR')")
+    //@PreAuthorize("hasAuthority('CUSTOMER') or hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<?> getNearbyActiveSessions(@Range(min = -90, max = 90, message = "{buyer.longitude.invalid}") @PathVariable(value = "buyerLongitude") double buyerLongitude,
                                                      @Range(min = -180, max = 180, message = "{buyer.latitude.invalid}") @PathVariable(value = "buyerLatitude") double buyerLatitude,
                                                      @Range(min = 1, message = "{nearby.sessions.count.invalid}") @PathVariable(value = "nearbySessionCount") int nearbySessionCount) {
@@ -132,7 +132,7 @@ public class SessionController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = Buyer.class, responseContainer = "List")
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER') or hasAuthority('ADMINISTRATOR')")
+    //@PreAuthorize("hasAuthority('CUSTOMER') or hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<?> getBuyers(@PathVariable(value = "session-id")
                                        @Range(min = 1, message = "{user.id.invalid}") Long sessionId,
                                        @PathVariable(value = "is-active") boolean isActive) {
@@ -150,7 +150,7 @@ public class SessionController {
             response = String.class)
     @ApiResponses(value = @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class))
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> sendNotificationsToFinishSession(@PathVariable(value = "session-id")
                                                               @Range(min = 1, message = "{user.id.invalid}") Long sessionId) {
         //if (customerAuthorizationService.isAuthorizedBySessionId(sessionId, AuthorizationUtils.getUserToken()))
@@ -166,7 +166,7 @@ public class SessionController {
             response = String.class)
     @ApiResponses(value = @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class))
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> finishSession(@PathVariable(value = "session-id")
                                            @Range(min = 1, message = "{session.id.invalid}") Long sessionId,
                                            @PathVariable(value = "is-force-stop") boolean isForceStop) {
@@ -185,7 +185,7 @@ public class SessionController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = AmountToBePaidResponse.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER') or hasAuthority('ADMINISTRATOR')")
+    //@PreAuthorize("hasAuthority('CUSTOMER') or hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<?> calculatePaymentForDataToBeUsed(@PathVariable(value = "session-id")
                                                              @Range(min = 1, message = "{session.id.invalid}") Long sessionId,
                                                              @PathVariable(value = "data-to-be-used")
@@ -205,7 +205,7 @@ public class SessionController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = SessionSummaryResponse.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER') or hasAuthority('ADMINISTRATOR')")
+    //@PreAuthorize("hasAuthority('CUSTOMER') or hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<?> getSessionSummary(@PathVariable(value = "session-id")
                                                @Range(min = 1, message = "{session.id.invalid}") Long sessionId) {
         SessionSummaryResponse sessionSummaryResponse =
@@ -224,7 +224,7 @@ public class SessionController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = SessionSummaryResponse.class, responseContainer = "List")
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> getSortedSessionsByStartTime(@PathVariable(value = "seller-id") @Range(min = 1, message = "{seller.id.invalid}") Long sellerId,
                                                           @PathVariable(value = "page") @Range(min = 0, max = Integer.MAX_VALUE, message = "{page.number.invalid}") int page,
                                                           @PathVariable(value = "size") @Range(min = 1, max = Integer.MAX_VALUE, message = "{page.size.invalid}") int size,
@@ -245,7 +245,7 @@ public class SessionController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = SessionSummaryResponse.class, responseContainer = "List")
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> getSortedSessionsByDataShared(@PathVariable(value = "seller-id") @Range(min = 1, message = "{seller.id.invalid}") Long sellerId,
                                                            @PathVariable(value = "page") @Range(min = 0, max = Integer.MAX_VALUE, message = "{page.number.invalid}") int page,
                                                            @PathVariable(value = "size") @Range(min = 1, max = Integer.MAX_VALUE, message = "{page.size.invalid}") int size,

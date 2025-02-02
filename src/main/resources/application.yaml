@@ -61,12 +61,6 @@ business:
   aes:
     secret-key: ${BUSINESS_AES_SECRET_KEY}
 
-email:
-  host: smtp.gmail.com
-  port: 587
-  no-reply-address: ${NO_REPLY_EMAIL_ADDRESS}
-  no-reply-password: ${NO_REPLY_EMAIL_PWD}
-
 razorpay:
   environment: live
   client: ${RAZORPAY_CLIENT_ID}
@@ -96,3 +90,10 @@ user:
 hibernate:
   validator:
     fail-fast: false
+
+email:
+  host: smtp.gmail.com
+  port: 587
+  noReplyAddress: ${NO_REPLY_EMAIL_ADDRESS}
+  noReplyPassword: ${NO_REPLY_EMAIL_PWD}
+

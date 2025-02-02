@@ -21,7 +21,7 @@ import java.security.GeneralSecurityException;
 @Slf4j
 public class GoogleProcessor {
 
-    @Value("{google.firebase.android.secret}")
+    /*@Value("{google.firebase.android.secret}")
     private String firebaseAndroidClientSecret;
 
     @Value("{google.firebase.file-name}")
@@ -79,7 +79,7 @@ public class GoogleProcessor {
             log.error("An error occurred : {}", e.getMessage(), e);
         }
         return false;
-    }
+    }*/
 
     //TODO
     /*public User getUserDetails(String token) {

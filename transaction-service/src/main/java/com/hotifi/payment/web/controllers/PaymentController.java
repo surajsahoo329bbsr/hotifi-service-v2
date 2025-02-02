@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,7 +45,7 @@ public class PaymentController {
             @ApiResponse(code = 204, message = SuccessMessages.OK, response = SellerReceiptResponse.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> notifySellerWithdrawalForAdmin(@PathVariable(value = "seller-id") @Range(min = 1, message = "{seller.id.invalid}") Long sellerId) {
         //if (customerAuthorizationService.isAuthorizedByUserId(sellerId, AuthorizationUtils.getUserToken()))
             paymentService.notifySellerWithdrawalForAdmin(sellerId);
@@ -63,7 +62,7 @@ public class PaymentController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = SellerReceiptResponse.class, responseContainer = "List")
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('ADMINISTRATOR')")
+    //@PreAuthorize("hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<?> getAllPendingSellerPaymentsForAdmin() {
         List<PendingTransfer> pendingTransfers = //AuthorizationUtils.isAdministratorRole() ?
                 paymentService.getAllPendingSellerPaymentsForAdmin(); // : null;
@@ -80,7 +79,7 @@ public class PaymentController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = UpiPendingTransfer.class, responseContainer = "List")
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('ADMINISTRATOR')")
+    //@PreAuthorize("hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<?> getAllPendingUpiSellerPaymentsForAdmin() {
         List<UpiPendingTransfer> upiPendingTransfers =
                 //AuthorizationUtils.isAdministratorRole() ?
@@ -98,7 +97,7 @@ public class PaymentController {
             @ApiResponse(code = 204, message = SuccessMessages.OK)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('ADMINISTRATOR')")
+    //@PreAuthorize("hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<?> updatePendingSellerPaymentsByAdmin(@RequestBody List<TransferUpdate> transfers) {
         //if (AuthorizationUtils.isAdministratorRole())
             paymentService.updatePendingSellerPaymentsByAdmin(transfers);
@@ -115,7 +114,7 @@ public class PaymentController {
             @ApiResponse(code = 204, message = SuccessMessages.OK)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('ADMINISTRATOR')")
+    //@PreAuthorize("hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<?> updatePendingUpiSellerPaymentsByAdmin(@RequestBody List<UPITransferUpdate> upiTransferUpdates) {
         //if (AuthorizationUtils.isAdministratorRole())
             paymentService.updatePendingUpiSellerPaymentsByAdmin(upiTransferUpdates);
@@ -132,7 +131,7 @@ public class PaymentController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = SellerReceiptResponse.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> withdrawSellerPayment(@PathVariable(value = "seller-id") @Range(min = 1, message = "{seller.id.invalid}") Long sellerId) {
         SellerReceiptResponse sellerReceiptResponse =
                 //customerAuthorizationService.isAuthorizedByUserId(sellerId, AuthorizationUtils.getUserToken()) ?
@@ -150,7 +149,7 @@ public class PaymentController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = SellerReceiptResponse.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
     public ResponseEntity<?> getSellerReceipt(@PathVariable(value = "id") @Range(min = 1, message = "{id.invalid}") Long id) {
         SellerReceiptResponse sellerReceiptResponse =
                 //AuthorizationUtils.isAdministratorRole() && customerAuthorizationService.isAuthorizedBySellerReceiptId(id, AuthorizationUtils.getUserToken()) ?
@@ -168,7 +167,7 @@ public class PaymentController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = SellerReceiptResponse.class, responseContainer = "List")
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
     public ResponseEntity<?> getSortedSellerReceiptsByDateTime(@PathVariable(value = "seller-id")
                                                                @Range(min = 1, message = "{seller.id.invalid}") Long sellerId,
                                                                @PathVariable(value = "page")
@@ -192,7 +191,7 @@ public class PaymentController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = SellerReceiptResponse.class, responseContainer = "List")
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
     public ResponseEntity<?> getSortedSellerReceiptsByAmountPaid(@PathVariable(value = "seller-id")
                                                                  @Range(min = 1, message = "{seller.id.invalid}") Long sellerId,
                                                                  @PathVariable(value = "page")
@@ -215,7 +214,7 @@ public class PaymentController {
             response = String.class)
     @ApiResponses(value = @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class))
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> withdrawBuyerRefunds(@PathVariable(value = "buyer-id")
                                                   @Range(min = 1, message = "{buyer.id.invalid}") Long buyerId) {
         //if (customerAuthorizationService.isAuthorizedByUserId(buyerId, AuthorizationUtils.getUserToken()))
@@ -233,7 +232,7 @@ public class PaymentController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = RefundReceiptResponse.class, responseContainer = "List")
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> getBuyerRefundReceipts(
             @PathVariable(value = "buyer-id")
             @Range(min = 1, message = "{buyer.id.invalid}") Long buyerId,
@@ -258,7 +257,7 @@ public class PaymentController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = PendingMoneyResponse.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> isPaymentDue(@PathVariable(value = "user-id") @Range(min = 1, message = "{user.id.invalid}") Long userId) {
         PendingMoneyResponse pendingMoneyResponse =
                 //customerAuthorizationService.isAuthorizedByUserId(userId, AuthorizationUtils.getUserToken()) ?

@@ -1,0 +1,48 @@
+server:
+  port: 9090  # Gateway runs on port 9090
+
+spring:
+  application:
+    name: api-gateway  # Register Gateway with Eureka
+
+  main:
+    web-application-type: reactive
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true  # Enable automatic service discovery via Eureka
+          lower-case-service-id: true  # Service names should be in lowercase
+      routes:
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user/**
+        - id: authentication-service
+          uri: lb://AUTHENTICATION-SERVICE
+          predicates:
+            - Path=/authentication/**
+        - id: email-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/notification/**
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    preferIpAddress: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html  # Access Swagger UI at /swagger-ui.html
+  api-docs:
+    groups:
+      enabled: true
+    urls:
+      - name: User Service API
+        url: /users/v3/api-docs
+      - name: Authentication Service API
+        url: /authentication/v3/api-docs

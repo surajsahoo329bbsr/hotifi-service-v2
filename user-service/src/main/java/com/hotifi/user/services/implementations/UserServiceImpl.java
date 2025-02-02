@@ -1,5 +1,6 @@
 package com.hotifi.user.services.implementations;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.util.Value;
 import com.hotifi.authentication.entities.Authentication;
 import com.hotifi.authentication.errors.codes.AuthenticationErrorCodes;
@@ -41,7 +42,7 @@ public class UserServiceImpl implements IUserService {
     private final IVerificationService verificationService;
     private final AuthenticationRepository authenticationRepository;
     private final INotificationService notificationService;
-    private final KafkaTemplate<String, UserEvent> userEventKafkaTemplate;
+    private final KafkaTemplate<String, String> userEventKafkaTemplate;
 
     @Value("${email.host}")
     private String emailHost;
@@ -58,7 +59,7 @@ public class UserServiceImpl implements IUserService {
     @Value("${facebook.app.deletion-status-url}")
     private String facebookDeletionStatusUrl;
 
-    public UserServiceImpl(UserRepository userRepository, AuthenticationRepository authenticationRepository, IVerificationService verificationService, INotificationService notificationService, KafkaTemplate<String, UserEvent> userEventKafkaTemplate) {
+    public UserServiceImpl(UserRepository userRepository, AuthenticationRepository authenticationRepository, IVerificationService verificationService, INotificationService notificationService, KafkaTemplate<String, String> userEventKafkaTemplate) {
         this.userRepository = userRepository;
         this.authenticationRepository = authenticationRepository;
         this.verificationService = verificationService;
@@ -98,8 +99,10 @@ public class UserServiceImpl implements IUserService {
                     .registrationEventTime(new Date(System.currentTimeMillis()))
                     .build();
 
-            userEventKafkaTemplate.send(ApplicationConstants.KAFKA_EMAIL_TOPIC, userEvent);
-            notificationService.sendNotificationToSingleUser(user.getId(), "A New Beginning !", "Your hotifi account has been created.", GOOGLE_CLOUD_PLATFORM);
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonMessage = objectMapper.writeValueAsString(userEvent);
+            userEventKafkaTemplate.send(ApplicationConstants.KAFKA_EMAIL_TOPIC, jsonMessage);
+            //notificationService.sendNotificationToSingleUser(user.getId(), "A New Beginning !", "Your hotifi account has been created.", GOOGLE_CLOUD_PLATFORM);
 
             userEventDTO = UserEventDTO.builder()
                     .userId(user.getId())

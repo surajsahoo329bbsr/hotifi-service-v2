@@ -16,6 +16,6 @@ public interface IEmailService {
 
     void sendLinkedAccountSuccessEmail(UserEventDTO userEventDTO);
 
-    void sendWelcomeEmail(UserEventDTO userEventDTO);
+    void sendWelcomeEmail(String userEventDTOMessage);
 
 }

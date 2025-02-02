@@ -1,6 +1,5 @@
 package com.hotifi.common.web.controllers;
 
-import com.hotifi.common.constants.ApplicationConstants;
 import com.hotifi.common.dto.UserEventDTO;
 import com.hotifi.common.exception.errors.ErrorMessages;
 import com.hotifi.common.exception.errors.ErrorResponse;
@@ -17,14 +16,13 @@ import javax.validation.Valid;
 
 @Validated
 @RestController
-@Api(tags = ApplicationConstants.USER_TAG)
 @RequestMapping(path = "/email")
 public class EmailController {
 
     @Autowired
     private IEmailService emailService;
 
-    @PostMapping(path = "/registration", consumes = MediaType.APPLICATION_JSON_VALUE)
+   /* @PostMapping(path = "/registration", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Add User Details",
             notes = "Add User Details",
@@ -35,7 +33,7 @@ public class EmailController {
     public ResponseEntity<?> sendWelcomeEmail(@RequestBody @Valid UserEventDTO userEventDTO) {
         emailService.sendWelcomeEmail(userEventDTO);
         return new ResponseEntity<>(userEventDTO, HttpStatus.OK);
-    }
+    }*/
 
     @PostMapping(path = "/suspend", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(

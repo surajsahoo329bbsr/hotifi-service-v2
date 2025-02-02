@@ -1,9 +1,6 @@
 package com.hotifi.user.events;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 
@@ -11,6 +8,7 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @Builder
+@ToString
 public class UserEvent {
 
     private Long userId;

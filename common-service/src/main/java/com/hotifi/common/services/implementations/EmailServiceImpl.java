@@ -1,6 +1,7 @@
 package com.hotifi.common.services.implementations;
 
-import com.google.api.client.util.Value;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hotifi.common.models.EmailConfigurationModel;
 import com.hotifi.common.constants.ApplicationConstants;
 import com.hotifi.common.constants.BusinessConstants;
 import com.hotifi.common.dto.UserEventDTO;
@@ -13,33 +14,43 @@ import org.simplejavamail.api.mailer.Mailer;
 import org.simplejavamail.api.mailer.config.TransportStrategy;
 import org.simplejavamail.email.EmailBuilder;
 import org.simplejavamail.mailer.MailerBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
+import org.springframework.kafka.listener.MessageListenerContainer;
+import org.springframework.stereotype.Component;
 import org.springframework.util.FileCopyUtils;
 
+import javax.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
+@Component
 public class EmailServiceImpl implements IEmailService {
 
     //private final INotificationService notificationService;
 
-    @Value("${email.host}")
-    private String emailHost;
+    private final EmailConfigurationModel emailConfigurationModel;
 
-    @Value("${email.port}")
-    private Integer emailPort;
+    private final KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 
-    @Value("${email.no-reply-address}")
-    private static String noReplyEmailAddress;
-
-    @Value("${email.no-reply-password}")
-    private static String noReplyEmailPassword;
+    @Autowired
+    public EmailServiceImpl(EmailConfigurationModel emailConfigurationModel, KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry){
+        this.emailConfigurationModel = emailConfigurationModel;
+        this.kafkaListenerEndpointRegistry = kafkaListenerEndpointRegistry;
+    }
 
     @Override
     @KafkaListener(topics = ApplicationConstants.KAFKA_EMAIL_TOPIC, groupId = ApplicationConstants.KAFKA_EMAIL_GROUP_ID)
-    public void sendWelcomeEmail(UserEventDTO userEventDTO) {
+    public void sendWelcomeEmail(String userEventDTOMessage) {
         try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            System.out.println("Kafka Area 51 userEventDTOMessage : " + userEventDTOMessage);
+            UserEventDTO userEventDTO = objectMapper.readValue(userEventDTOMessage, UserEventDTO.class);
+            System.out.println("Kafka 69 firstName : " + userEventDTO.getFirstName());
             String subject = "Welcome To Hotifi";
             ClassPathResource classPathResource = new ClassPathResource(ApplicationConstants.EMAIL_WELCOME_HTML_PATH);
             byte[] byteData = FileCopyUtils.copyToByteArray(classPathResource.getInputStream());
@@ -53,7 +64,7 @@ public class EmailServiceImpl implements IEmailService {
     }
 
     @Override
-    @KafkaListener(topics = ApplicationConstants.KAFKA_EMAIL_TOPIC, groupId = ApplicationConstants.KAFKA_EMAIL_GROUP_ID)
+    //@KafkaListener(topics = ApplicationConstants.KAFKA_EMAIL_TOPIC, groupId = ApplicationConstants.KAFKA_EMAIL_GROUP_ID)
     public void sendAccountDeletedEmail(UserEventDTO userEventDTO) {
         try {
             String subject = "Your account has been deleted";
@@ -69,7 +80,7 @@ public class EmailServiceImpl implements IEmailService {
     }
 
     @Override
-    @KafkaListener(topics = ApplicationConstants.KAFKA_EMAIL_TOPIC, groupId = ApplicationConstants.KAFKA_EMAIL_GROUP_ID)
+    //@KafkaListener(topics = ApplicationConstants.KAFKA_EMAIL_TOPIC, groupId = ApplicationConstants.KAFKA_EMAIL_GROUP_ID)
     public void sendAccountFrozenEmail(UserEventDTO userEventDTO) {
         try {
             String subject = "Your account has been suspended.";
@@ -86,7 +97,7 @@ public class EmailServiceImpl implements IEmailService {
     }
 
     @Override
-    @KafkaListener(topics = ApplicationConstants.KAFKA_EMAIL_TOPIC, groupId = ApplicationConstants.KAFKA_EMAIL_GROUP_ID)
+    //@KafkaListener(topics = ApplicationConstants.KAFKA_EMAIL_TOPIC, groupId = ApplicationConstants.KAFKA_EMAIL_GROUP_ID)
     public void sendBuyerBannedEmail(UserEventDTO userEventDTO) {
         try {
             String subject = "Your buying account has been banned";
@@ -119,7 +130,7 @@ public class EmailServiceImpl implements IEmailService {
     }
 
     @Override
-    @KafkaListener(topics = ApplicationConstants.KAFKA_EMAIL_TOPIC, groupId = ApplicationConstants.KAFKA_EMAIL_GROUP_ID)
+    //@KafkaListener(topics = ApplicationConstants.KAFKA_EMAIL_TOPIC, groupId = ApplicationConstants.KAFKA_EMAIL_GROUP_ID)
     public void sendLinkedAccountFailed(UserEventDTO userEventDTO) {
         try {
             String subject = "Your linked account verification for payment failed";
@@ -137,7 +148,7 @@ public class EmailServiceImpl implements IEmailService {
     }
 
     @Override
-    @KafkaListener(topics = ApplicationConstants.KAFKA_EMAIL_TOPIC, groupId = ApplicationConstants.KAFKA_EMAIL_GROUP_ID)
+    //@KafkaListener(topics = ApplicationConstants.KAFKA_EMAIL_TOPIC, groupId = ApplicationConstants.KAFKA_EMAIL_GROUP_ID)
     public void sendLinkedAccountSuccessEmail(UserEventDTO userEventDTO) {
         try {
             String subject = "Your linked account verification for payment is successful";
@@ -156,14 +167,14 @@ public class EmailServiceImpl implements IEmailService {
     private void sendEmail(String toEmailAddress, String subject, Document document) {
         String htmlContent = document.html();
         Email email = EmailBuilder.startingBlank()
-                .from(noReplyEmailAddress)
+                .from(emailConfigurationModel.getNoReplyAddress())
                 .to(toEmailAddress)
                 .withSubject(subject)
                 .withHTMLText(htmlContent)
                 .buildEmail();
 
         Mailer mailer = MailerBuilder
-                .withSMTPServer(emailHost, emailPort, noReplyEmailAddress, noReplyEmailPassword)
+                .withSMTPServer(emailConfigurationModel.getHost(), emailConfigurationModel.getPort(), emailConfigurationModel.getNoReplyAddress(), emailConfigurationModel.getNoReplyPassword())
                 .withTransportStrategy(TransportStrategy.SMTP_TLS)
                 .withSessionTimeout(10 * 1000)
                 .async()

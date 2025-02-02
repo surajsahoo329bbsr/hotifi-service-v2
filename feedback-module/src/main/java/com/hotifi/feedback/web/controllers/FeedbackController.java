@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +39,7 @@ public class FeedbackController {
             response = String.class)
     @ApiResponses(value = @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class))
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> addFeedback(@RequestBody @Validated FeedbackRequest feedbackRequest) {
         //if (customerAuthorizationService.isAuthorizedByPurchaseId(feedbackRequest.getPurchaseId(), AuthorizationUtils.getUserToken()))
             feedbackService.addFeedback(feedbackRequest);
@@ -57,7 +56,7 @@ public class FeedbackController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = Feedback.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
     public ResponseEntity<?> getPurchaseFeedback(@PathVariable(value = "purchase-id") @Range(min = 1, message = "{purchase.id.invalid}") Long purchaseId) {
         Feedback feedback = //(AuthorizationUtils.isAdministratorRole() ||
                 //customerAuthorizationService.isAuthorizedByPurchaseId(purchaseId, AuthorizationUtils.getUserToken())) ?
@@ -75,7 +74,7 @@ public class FeedbackController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = FeedbackResponse.class, responseContainer = "List")
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
     public ResponseEntity<?> getSellerFeedbacks(@PathVariable(value = "seller-id")
                                                 @Range(min = 1, message = "{seller.id.invalid}") Long sellerId,
                                                 @PathVariable(value = "page")
@@ -97,7 +96,7 @@ public class FeedbackController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = SellerReviewsResponse.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
     public ResponseEntity<?> getSellerRatingDetails(@PathVariable(value = "seller-id")
                                                     @Range(min = 1, message = "{seller.id.invalid}") Long sellerId) {
         SellerReviewsResponse sellerReviewsResponse = feedbackService.getSellerRatingDetails(sellerId);

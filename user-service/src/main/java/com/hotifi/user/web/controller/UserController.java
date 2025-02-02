@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -129,13 +128,12 @@ public class UserController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = User.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
     public ResponseEntity<?> getUserByUsername(@PathVariable(value = "username")
-                                               @NotBlank(message = "{username.blank}")
                                                @Pattern(regexp = BusinessConstants.VALID_USERNAME_PATTERN, message = "{username.invalid}") String username) {
         User user = //(AuthorizationUtils.isAdministratorRole() ||
                 //customerAuthorizationService.isAuthorizedByUsername(username, AuthorizationUtils.getUserToken())) ?
-                userService.getUserByUsername(username); //: null;
+                 userService.getUserByUsername(username); //: null;
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
@@ -149,7 +147,6 @@ public class UserController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = AvailabilityResponse.class)
     })
     public ResponseEntity<?> isUsernameAvailable(@PathVariable(value = "username")
-                                                 @NotBlank(message = "{username.blank}")
                                                  @Pattern(regexp = BusinessConstants.VALID_USERNAME_PATTERN, message = "{username.invalid}") String username) {
         //No need to check for role security here
         boolean isUsernameAvailable = userService.isUsernameAvailable(username);
@@ -166,9 +163,8 @@ public class UserController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = User.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
     public ResponseEntity<?> getUserByIdentifier(@PathVariable(value = "identifier-id")
-                                                 @NotBlank(message = "{identifier.id.blank}")
                                                  @Length(max = 255, message = "{identifier.id.length.invalid}") String identifier) {
         User socialUser = userRepository.findByFacebookId(identifier) == null ? userRepository.findByGoogleId(identifier) : null;
         User user = //(AuthorizationUtils.isAdministratorRole() ||
@@ -219,7 +215,7 @@ public class UserController {
             response = String.class)
     @ApiResponses(value = @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class))
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> updateUserLogin(@PathVariable(value = "email") @Email(message = "{user.email.invalid}") String email) {
         //if (customerAuthorizationService.isAuthorizedByEmail(email, AuthorizationUtils.getUserToken()))
             userService.updateUserLogin(email, true);
@@ -234,7 +230,7 @@ public class UserController {
             response = String.class)
     @ApiResponses(value = @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class))
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> updateUserLogout(@PathVariable(value = "email") @Email(message = "{user.email.invalid}") String email) {
         //if (customerAuthorizationService.isAuthorizedByEmail(email, AuthorizationUtils.getUserToken()))
             userService.updateUserLogin(email, false);
@@ -249,7 +245,7 @@ public class UserController {
             response = String.class)
     @ApiResponses(value = @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class))
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> updateUser(@RequestBody @Valid UserRequest userRequest) {
         //if (customerAuthorizationService.isAuthorizedByAuthenticationId(userRequest.getAuthenticationId(), AuthorizationUtils.getUserToken()))
             userService.updateUser(userRequest);
@@ -267,7 +263,7 @@ public class UserController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = User.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('ADMINISTRATOR') or hasAuthority('CUSTOMER')")
     public ResponseEntity<?> getUserByEmail(@PathVariable(value = "email") @Email(message = "{email.invalid}") String email) {
         User user = //((AuthorizationUtils.isAdministratorRole()
                 //|| customerAuthorizationService.isAuthorizedByEmail(email, AuthorizationUtils.getUserToken()))) ?

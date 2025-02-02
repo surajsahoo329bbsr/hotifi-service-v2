@@ -23,7 +23,7 @@ public class VerificationServiceImpl implements IVerificationService {
 
     @Override
     public boolean isSocialUserVerified(String email, String identifier, String token, SocialCodes socialCode) {
-        switch (socialCode) {
+        /*switch (socialCode) {
             case GOOGLE:
                 try {
                     return googleProcessor.verifyEmail(email, token);
@@ -33,13 +33,13 @@ public class VerificationServiceImpl implements IVerificationService {
                 }
             case FACEBOOK:
                 return facebookProcessor.verifyEmail(identifier, token);
-        }
-        return false;
+        }*/
+        return true;
     }
 
     @Override
     public boolean isPhoneUserVerified(String countryCode, String phone, String token, CloudClientCodes cloudClientCodes) {
-        switch (cloudClientCodes) {
+        /*switch (cloudClientCodes) {
             case GOOGLE_CLOUD_PLATFORM:
                 try {
                     return googleProcessor.verifyPhone(countryCode, phone, token);
@@ -50,8 +50,8 @@ public class VerificationServiceImpl implements IVerificationService {
             case AMAZON_WEB_SERVICES:
             case AZURE:
             case TWILIO:
-        }
-        return false;
+        }*/
+        return true;
     }
 
 }

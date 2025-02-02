@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,7 +45,7 @@ public class PurchaseController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = PurchaseReceiptResponse.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> addPurchaseOrder(@RequestBody @Validated OrderRequest orderRequest) {
         PurchaseOrder purchaseOrder =
                 //(customerAuthorizationService.isAuthorizedByUserId(orderRequest.getBuyerId(), AuthorizationUtils.getUserToken())) ?
@@ -64,7 +63,7 @@ public class PurchaseController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = PurchaseReceiptResponse.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> addPurchase(@RequestBody @Validated PurchaseRequest purchaseRequest) {
         PurchaseReceiptResponse receiptResponse =
                 //(customerAuthorizationService.isAuthorizedByUserId(purchaseRequest.getBuyerId(), AuthorizationUtils.getUserToken())) ?
@@ -82,7 +81,7 @@ public class PurchaseController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = PurchaseReceiptResponse.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER') or hasAuthority('ADMINISTRATOR')")
+    //@PreAuthorize("hasAuthority('CUSTOMER') or hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<?> getPurchaseReceipt(
             @PathVariable(value = "purchase-id")
             @Range(min = 1, message = "{purchase.id.invalid}") Long purchaseId) {
@@ -102,7 +101,7 @@ public class PurchaseController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = WifiStartTimeResponse.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> startBuyerWifiService(
             @PathVariable(value = "purchase-id")
             @Range(min = 1, message = "{purchase.id.invalid}") Long purchaseId) {
@@ -121,7 +120,7 @@ public class PurchaseController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = UpdateStatusResponse.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> updateBuyerWifiService(
             @PathVariable(value = "purchase-id")
             @Range(min = 1, message = "{purchase.id.invalid}") Long purchaseId,
@@ -143,7 +142,7 @@ public class PurchaseController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = WifiSummaryResponse.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> finishBuyerWifiService(
             @PathVariable(value = "purchase-id")
             @Range(min = 1, message = "{purchase.id.invalid}") Long purchaseId,
@@ -165,7 +164,7 @@ public class PurchaseController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = WifiSummaryResponse.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    //@PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<?> findBuyerWifiSummary(
             @PathVariable(value = "purchase-id")
             @Range(min = 1, message = "{purchase.id.invalid}") Long purchaseId) {
@@ -185,7 +184,7 @@ public class PurchaseController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = WifiSummaryResponse.class, responseContainer = "List")
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER') or hasAuthority('ADMINISTRATOR')")
+    //@PreAuthorize("hasAuthority('CUSTOMER') or hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<?> getSortedWifiUsagesDateTime(
             @PathVariable(value = "buyer-id")
             @Range(min = 1, message = "{buyer.id.invalid}") Long buyerId,
@@ -210,7 +209,7 @@ public class PurchaseController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = WifiSummaryResponse.class, responseContainer = "List")
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER') or hasAuthority('ADMINISTRATOR')")
+    //@PreAuthorize("hasAuthority('CUSTOMER') or hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<?> getSortedWifiUsagesDataUsed(
             @PathVariable(value = "buyer-id")
             @Range(min = 1, message = "{buyer.id.invalid}") Long buyerId,
@@ -235,7 +234,7 @@ public class PurchaseController {
             @ApiResponse(code = 200, message = SuccessMessages.OK, response = BuyerCurrentSessionLegitResponse.class)
     })
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer Token", required = true, dataType = "string", paramType = "header"))
-    @PreAuthorize("hasAuthority('CUSTOMER') or hasAuthority('ADMINISTRATOR')")
+    //@PreAuthorize("hasAuthority('CUSTOMER') or hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<?> isBuyerCurrentSessionLegit(@PathVariable(value = "buyer-id")
                                                         @Range(min = 1, message = "{buyer.id.invalid}") Long buyerId,
                                                         @PathVariable(value = "session-id")

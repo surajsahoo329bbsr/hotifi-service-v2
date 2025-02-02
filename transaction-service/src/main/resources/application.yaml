@@ -8,5 +8,11 @@ server:
     include-binding-errors: always
 
 spring:
+  cache:
+    type: redis
+    host: localhost
+    port: 6379
+    redis:
+      time-to-live: 60000
   config:
     import: "C:/Users/Suraj.000/IdeaProjects/hotifi-service-v2/src/main/resources/application.yaml"

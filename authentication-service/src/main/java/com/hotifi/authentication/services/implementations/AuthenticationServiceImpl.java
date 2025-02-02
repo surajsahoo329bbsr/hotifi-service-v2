@@ -18,18 +18,11 @@ import com.hotifi.authentication.web.response.CredentialsResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class AuthenticationServiceImpl implements IAuthenticationService {
@@ -38,7 +31,6 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private final RoleRepository roleRepository;
     private final IVerificationService verificationService;
     private final IEmailService emailService;
-
 
     public AuthenticationServiceImpl(AuthenticationRepository authenticationRepository, RoleRepository roleRepository, IVerificationService verificationService, IEmailService emailService) {
         this.authenticationRepository = authenticationRepository;
@@ -51,9 +43,9 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     @Transactional(readOnly = true)
     public Authentication getAuthentication(String email) {
         Authentication authentication = authenticationRepository.findByEmail(email);
-        boolean isAdminEmail = authentication != null && authentication.getRoles()
-                .stream().anyMatch(role -> role.getName() == RoleName.ADMINISTRATOR);
-        if (authentication == null || isAdminEmail)
+        /*boolean isAdminEmail = authentication != null && authentication.getRoles()
+                .stream().anyMatch(role -> role.getName() == RoleName.ADMINISTRATOR);*/
+        if (authentication == null)
             throw new ApplicationException(AuthenticationErrorCodes.EMAIL_NOT_FOUND);
         authentication.setCountryCode(null);
         authentication.setPhone(null);
@@ -173,7 +165,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         return !authenticationRepository.existsByEmail(email);
     }
 
-    @Override
+    /*@Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Authentication authentication = authenticationRepository.findByEmail(email);
         if (email == null)
@@ -183,5 +175,5 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                 .map(role -> new SimpleGrantedAuthority(role.getName().name()))
                 .collect(Collectors.toList());
         return new User(authentication.getEmail(), authentication.getPassword(), authorities);
-    }
+    }*/
 }
