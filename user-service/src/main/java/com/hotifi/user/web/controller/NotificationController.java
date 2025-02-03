@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 @RestController
 @Api(tags = ApplicationConstants.NOTIFICATION_TAG)
-@RequestMapping(path = "/notification")
 public class NotificationController {
 
     @Autowired

@@ -23,10 +23,14 @@ spring:
           uri: lb://AUTHENTICATION-SERVICE
           predicates:
             - Path=/authentication/**
-        - id: email-service
+        - id: notification-service
           uri: lb://NOTIFICATION-SERVICE
           predicates:
             - Path=/notification/**
+        - id: speedtest-service
+          uri: lb://SPEEDTEST-SERVICE
+          predicates:
+            - Path=/speedtest/**
 
 eureka:
   client:

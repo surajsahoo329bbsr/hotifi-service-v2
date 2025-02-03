@@ -16,7 +16,6 @@ import javax.validation.Valid;
 
 @Validated
 @RestController
-@RequestMapping(path = "/email")
 public class EmailController {
 
     @Autowired

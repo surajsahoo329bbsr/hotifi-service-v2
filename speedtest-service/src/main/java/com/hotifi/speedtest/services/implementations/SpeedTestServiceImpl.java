@@ -3,6 +3,7 @@ package com.hotifi.speedtest.services.implementations;
 import com.hotifi.authentication.entities.Authentication;
 import com.hotifi.common.constants.BusinessConstants;
 import com.hotifi.common.exception.ApplicationException;
+import com.hotifi.speedtest.clients.AuthenticationServiceFeignClient;
 import com.hotifi.speedtest.constants.codes.NetworkProviderCodes;
 import com.hotifi.speedtest.entities.SpeedTest;
 import com.hotifi.speedtest.errors.codes.SpeedTestErrorCodes;
@@ -13,12 +14,12 @@ import com.hotifi.user.entitiies.User;
 import com.hotifi.user.errors.codes.UserErrorCodes;
 import com.hotifi.user.repositories.UserRepository;
 import com.hotifi.user.validators.UserValidatorUtils;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -27,14 +28,18 @@ public class SpeedTestServiceImpl implements ISpeedTestService {
 
     private final UserRepository userRepository;
     private final SpeedTestRepository speedTestRepository;
+    private final AuthenticationServiceFeignClient authenticationServiceFeignClient;
+    private static final String CIRCUIT_BREAKER_NAME = "authenticationExternalService";
 
-    public SpeedTestServiceImpl(UserRepository userRepository, SpeedTestRepository speedTestRepository) {
+    public SpeedTestServiceImpl(UserRepository userRepository, SpeedTestRepository speedTestRepository, AuthenticationServiceFeignClient authenticationServiceFeignClient) {
         this.userRepository = userRepository;
         this.speedTestRepository = speedTestRepository;
+        this.authenticationServiceFeignClient = authenticationServiceFeignClient;
     }
 
     @Transactional
     @Override
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "authenticationFallbackResponse")
     public void addSpeedTest(SpeedTestRequest speedTestRequest) {
 
         boolean isBelowWifiDownloadSpeed = Double.compare(speedTestRequest.getDownloadSpeed(), BusinessConstants.MINIMUM_WIFI_DOWNLOAD_SPEED_MEGABYTES) < 0
@@ -49,8 +54,9 @@ public class SpeedTestServiceImpl implements ISpeedTestService {
 
         User user = userRepository.findById(speedTestRequest.getUserId()).orElse(null);
 
-        RestTemplate restTemplate = new RestTemplate();
-        Authentication authentication = restTemplate.getForObject("http://localhost:5001/authentication/" + user.getAuthenticationId(), Authentication.class);
+        //RestTemplate restTemplate = new RestTemplate();
+        assert user != null;
+        Authentication authentication = authenticationServiceFeignClient.getAuthenticationById(user.getAuthenticationId());//restTemplate.getForObject("http://localhost:5001/authentication/" + user.getAuthenticationId(), Authentication.class);
 
         if (UserValidatorUtils.isUserInvalid(user, authentication) && !user.isLoggedIn())
             throw new ApplicationException(UserErrorCodes.USER_NOT_LEGIT);
@@ -66,6 +72,11 @@ public class SpeedTestServiceImpl implements ISpeedTestService {
             log.error("Error occurred at {}", e.getMessage(), e);
             throw new ApplicationException(SpeedTestErrorCodes.UNEXPECTED_SPEED_TEST_ERROR);
         }
+    }
+
+
+    public void authenticationFallbackResponse(Exception e) {
+        System.out.println("Authentication Fallback Exception message is "+  e.getMessage());
     }
 
     @Transactional

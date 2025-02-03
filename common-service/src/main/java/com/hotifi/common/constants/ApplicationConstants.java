@@ -22,7 +22,7 @@ public class ApplicationConstants {
 
         //Swagger Configuration
         public static final String USER_TAG = "user";
-        public static final String SPEED_TEST_TAG = "speed-test";
+        public static final String SPEED_TEST_TAG = "speedtest";
         public static final String NOTIFICATION_TAG = "notification";
         public static final String USER_STATUS_TAG = "user-status";
         public static final String EMAIL_TAG = "email";

@@ -15,9 +15,9 @@ spring:
     validationQuery: SELECT 1
   jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
-    generate-ddl: true
+    generate-ddl: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: none # set it to auto for updating schemas regularly
       naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
     show-sql: true
     properties:

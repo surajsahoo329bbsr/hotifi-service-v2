@@ -22,6 +22,7 @@ import java.util.List;
 @Validated
 @RestController
 @Api(tags = ApplicationConstants.SPEED_TEST_TAG)
+@RequestMapping("/speedtest")
 public class SpeedTestController {
 
     @Autowired
@@ -39,7 +40,7 @@ public class SpeedTestController {
     @ApiResponses(value = @ApiResponse(code = 500, message = ErrorMessages.INTERNAL_ERROR, response = ErrorResponse.class))
     @ApiImplicitParams(value = @ApiImplicitParam(name = "Authorization", value = "Bearer token", required = true, dataType = "string", paramType = "header"))
     //@PreAuthorize("hasAuthority('CUSTOMER')")
-    public ResponseEntity<?> addSpeedTest(@RequestBody @Validated SpeedTestRequest speedTestRequest) {
+    public ResponseEntity<?> addSpeedTest(@RequestBody SpeedTestRequest speedTestRequest) {
         //if (customerAuthorizationService.isAuthorizedByUserId(speedTestRequest.getUserId(), AuthorizationUtils.getUserToken()))
             speedTestService.addSpeedTest(speedTestRequest);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

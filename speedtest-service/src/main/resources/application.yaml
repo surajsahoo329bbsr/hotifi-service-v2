@@ -1,12 +1,45 @@
 server:
-  servlet:
-    context-path: /speedtest/
+  #servlet:
+    #context-path: /speedtest/
   port: 5003
   error:
     include-stacktrace: never
     include-message: always
     include-binding-errors: always
 
+feign:
+  circuitbreaker:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  health:
+    circuitbreakers:
+      enabled: true
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      externalService:
+        failureRateThreshold: 50  # Open circuit if 50% of requests fail
+        minimumNumberOfCalls: 5   # Minimum calls before evaluating failure rate
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 10s  # Wait 10s before transitioning to HALF-OPEN
+        permittedNumberOfCallsInHalfOpenState: 2
+        slidingWindowSize: 10  # Track the last 10 calls
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
 spring:
+  application:
+    name: speedtest-service
+  security:
+    enabled: false
   config:
     import: "C:/Users/Suraj.000/IdeaProjects/hotifi-service-v2/src/main/resources/application.yaml"
